@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+{% load static %}
+{% load extra_filters %}
+{% load bleach_tags %}
+
+
+<html>
+<head lang="en">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<!--  prevent favicon -->
+<link rel="icon" href="data:,">
+
+<link type="text/css" rel="stylesheet" href="{% static 'mainapp/base.css' %}">
+
+<!--activate mathjax for math in markdown -->
+
+<!-- source1:   https://stackoverflow.com/a/61321145/333403 -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full"></script>
+
+<!-- source2: https://github.com/mitya57/python-markdown-math  -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  config: ["MMLorHTML.js"],
+  jax: ["input/TeX", "output/HTML-CSS", "output/NativeMML"],
+  extensions: ["MathMenu.js", "MathZoom.js"]
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.min.css">
+
+
+
+<title>MainApp - Test APP</title>
+
+
+<style>
+body {
+  background-color: linen;
+}
+
+.autoComplete_wrapper {
+
+  margin-top: 10px;
+
+}
+.autoComplete_wrapper > ul  {
+  color: c;
+  padding-left: 10px;
+}
+
+
+li.selected {
+  background-color: linen !important;
+  text-decoration: underline;
+}
+
+li.copied {
+  background: linen !important;
+  color: maroon !important;
+  text-decoration: italic;
+}
+</style>
+
+</head>
+
+<body>
+<!--utc_landing_page-->
+
+<div class="main">
+    Search Item:
+
+
+    <div id="autoComplete" class="autoComplete_wrapper" role="combobox" aria-owns="autoComplete_list_1" aria-haspopup="true" aria-expanded="false">
+<!--         <div  class="autocomplete"> -->
+            <input id="main-input" class="autocomplete-input" />
+            <p id="result-info"></p>
+            <ul id="autocomplete-result-list" class="autocomplete-result-list"></ul>
+<!--         </div> -->
+
+    </div>
+
+</div>
+
+<!--<script type="text/javascript" src="{% static 'mainapp/main.js' %}"></script>-->
+
+
+
+
+<script>
+let result_list = document.getElementById("autocomplete-result-list");
+let main_input = document.getElementById("main-input");
+const info = document.getElementById("result-info");
+
+
+// ✅ Move focus to END of input field
+main_input.setSelectionRange(main_input.value.length, main_input.value.length);
+main_input.focus()
+
+main_input.addEventListener("input", async function(){
+    const query = main_input.value;
+    const url = `/search/?q=${main_input.value}`;
+    const source = await fetch(url);
+    const res = await source.json();
+//     console.log(res.data);
+
+    result_list.innerHTML = '';
+    if (main_input.value.length == 0) {
+        console.log(`input empty`);
+        return
+    }
+    if (res.data.length > 0) {
+        info.innerHTML = `Displaying <strong>${res.data.length}</strong> results`;
+    } else {
+        info.innerHTML = `Found <strong>${res.data.length}</strong> matching results for <strong>"${query}"</strong>`;
+    }
+    result_list.prepend(info);
+
+    if (res.data.length > 0) {
+        res.data.forEach(function(item){
+//         console.log(`-->${item}`);
+            var li = document.createElement("li");
+            li.appendChild(document.createTextNode(item));
+            result_list.appendChild(li);
+        })
+    }
+});
+
+/*
+
+13: Enter
+40: ↓
+38: ↑
+https://www.toptal.com/developers/keycode/for/l
+113: F2
+27: ESC
+
+
+TODO: ESC: eingabe löschen, leerer String keine Ausgabe, F2 Eingabegfeld fokussieren
+
+*/
+
+
+
+
+// source: https://codepen.io/mehuldesign/pen/eYpbXMg
+var liSelected;
+var index = -1;
+
+// shortcuts for input
+main_input.addEventListener('keydown', function(event) {
+  var maxidx = result_list.getElementsByTagName('li').length - 1;
+//   if (maxidx == -1) {
+//     return
+//   }
+  if (event.which === 40 && maxidx > -1) {
+    index++;
+    //down
+    if (liSelected) {
+      liSelected.classList.remove("selected");
+      liSelected.classList.remove("copied");
+      next = result_list.getElementsByTagName('li')[index];
+      if (typeof next !== undefined && index <= maxidx) {
+
+        liSelected = next;
+      } else {
+        index = 0;
+        liSelected = result_list.getElementsByTagName('li')[0];
+      }
+//       addClass(liSelected, 'selected');
+      console.log(index);
+    } else {
+      index = 0;
+
+      liSelected = result_list.getElementsByTagName('li')[0];
+//       addClass(liSelected, 'selected');
+    }
+    console.log(`liSelected: ${liSelected}`);
+    console.log(`classList: ${liSelected.classList}`);
+    liSelected.classList.add("selected");
+    console.log(`classList2: ${liSelected.classList}`);
+  } else if (event.which === 38 && maxidx > -1) {
+
+    //up
+    if (liSelected) {
+      liSelected.classList.remove("selected");
+      liSelected.classList.remove("copied");
+      index--;
+      console.log(index);
+      next = result_list.getElementsByTagName('li')[index];
+      if (typeof next !== undefined && index >= 0) {
+        liSelected = next;
+      } else {
+        index = maxidx;
+        liSelected = result_list.getElementsByTagName('li')[maxidx];
+      }
+    } else {
+      index = 0;
+      liSelected = result_list.getElementsByTagName('li')[maxidx];
+    }
+    console.log(`liSelected-: ${liSelected}`);
+    console.log(`classList-: ${liSelected.classList}`);
+    liSelected.classList.add("selected");
+    console.log(`classList2-: ${liSelected.classList}`);
+  } else if (event.which === 13 && liSelected ) {
+    // Enter
+    console.log(`Enter-->${liSelected.innerHTML}`);
+    copytoclipboard(liSelected.innerHTML);
+    liSelected.classList.add("copied");
+  } else if (event.which === 27) {
+    // ESC
+    console.log("ESC");
+    clearinput();
+    result_list.innerHTML = '';
+  }
+}, false);
+
+// F2 → select input
+document.addEventListener('keydown', function(event) {
+    if (event.which === 113) {
+    // F2
+    console.log("F2");
+    main_input.focus();
+  }
+}, false);
+
+function copytoclipboard(text){
+
+    navigator.clipboard.writeText(text).then(function() {
+    //console.log('Async: Copying to clipboard was successful!');
+    }, function(err) {
+    console.error('Async: Could not copy text: ', err);
+    });
+};
+
+function clearinput(){
+
+    main_input.value="";
+};
+
+
+
+
+</script>
+
+
+</body>
+</html>
+
+
+
