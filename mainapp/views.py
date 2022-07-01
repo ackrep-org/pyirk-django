@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
+from django.template.loader import get_template
 import pyerk
 
 from ipydex import IPS
@@ -14,16 +15,17 @@ def reload_data():
 
     mod = pyerk.erkloader.load_mod_from_path("../controltheory_experiments/knowledge_base1.py", "knowledge_base1")
 
-    data = [repr(itm) for itm in pyerk.ds.items.values()]
+    for itm in pyerk.ds.items.values():
+        Item.objects.create(
+            key_str=itm.short_key,
+            label=getattr(itm, "R1", None),
+            description=getattr(itm, "R2", None),
+        )
 
-    for txt in data:
-        Item.objects.create(label=txt)
 
+def home_page_view(request):
 
-def home_page_view(request, form_data_len=None):
-
-    # generate_data()
-
+    # TODO: in the future this should not be triggered on every page refresh
     reload_data()
 
     context = dict(greeting_message="Hello, World!")
@@ -35,13 +37,21 @@ def home_page_view(request, form_data_len=None):
 def get_item(request):
 
     q = request.GET.get("q")
+    template = get_template("mainapp/entity-list-entry.html")
 
     payload = []
     if q:
         items = Item.objects.filter(label__icontains=q)
 
-        for item in items:
-            payload.append(str(item))
+        for db_item in items:
+            db_item: Item
+            ctx = {
+                "key_str": db_item.key_str,
+                "label": db_item.label,
+                "description": db_item.description,
+            }
+            rendered_item = template.render(context=ctx)
+            payload.append(rendered_item)
 
     return JsonResponse({"status": 200, "data": payload})
 

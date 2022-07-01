@@ -5,7 +5,9 @@ from django.db import models
 
 class Item(models.Model):
     id = models.BigAutoField(primary_key=True)
-    label = models.TextField()
+    key_str = models.TextField(default="(unknown key)")
+    label = models.TextField(default="", null=True)
+    description = models.TextField(default="", null=True)
 
     objects = models.Manager()  # make PyCharm happy
 
