@@ -59,7 +59,7 @@ def get_item(request):
 def mockup(request):
 
     # TODO: in the future this should not be triggered on every page refresh
-    reload_data()
+    # reload_data()
 
     context = dict(greeting_message="Hello, World!")
 

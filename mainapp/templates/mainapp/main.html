@@ -15,23 +15,6 @@
 
 <link type="text/css" rel="stylesheet" href="{% static 'mainapp/base.css' %}">
 
-<!--activate mathjax for math in markdown -->
-
-<!-- source1:   https://stackoverflow.com/a/61321145/333403 -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full"></script>
-
-<!-- source2: https://github.com/mitya57/python-markdown-math  -->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  config: ["MMLorHTML.js"],
-  jax: ["input/TeX", "output/HTML-CSS", "output/NativeMML"],
-  extensions: ["MathMenu.js", "MathZoom.js"]
-});
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.min.css">
-
 
 
 <title>MainApp - Test APP</title>
@@ -84,11 +67,11 @@ li.copied {
 
 
     <div id="autoComplete" class="autoComplete_wrapper" role="combobox" aria-owns="autoComplete_list_1" aria-haspopup="true" aria-expanded="false">
-<!--         <div  class="autocomplete"> -->
+        <div  class="ac_input_wrapper">
             <input id="main-input" class="autocomplete-input" />
+        </div>
             <p id="result-info"></p>
             <ul id="autocomplete-result-list" class="autocomplete-result-list"></ul>
-<!--         </div> -->
 
     </div>
 
