@@ -94,7 +94,7 @@ body a:hover{
   left: 0;
   right: 0;
   margin: .5rem 0 0 0;
-  padding: 1rem;
+  padding: 0 1rem 0 1rem;
   z-index: 1;
   list-style: none;
   border-radius: .6rem;
@@ -173,6 +173,10 @@ li.copied {
 .entity-description {
   color: #555;
   font-size: 70%;
+}
+
+.hidden {
+    display: none;
 }
 
 

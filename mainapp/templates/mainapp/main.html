@@ -190,6 +190,9 @@ main_input.addEventListener('keydown', function(event) {
     console.log(`classList-: ${liSelected.classList}`);
     liSelected.classList.add("selected");
     console.log(`classList2-: ${liSelected.classList}`);
+  } else if (event.which === 13 &&event.shiftKey && liSelected ) {
+    // Shift + Enter
+    console.log(`Shift Enter-->${liSelected.innerHTML}`);
   } else if (event.which === 13 && liSelected ) {
     // Enter
     console.log(`Enter-->${liSelected.innerHTML}`);
@@ -210,6 +213,17 @@ document.addEventListener('keydown', function(event) {
     console.log("F2");
     main_input.focus();
   }
+}, false);
+
+main_input.addEventListener("focusin",function(event) {
+    console.log("Focus");
+    console.log(result_list.innerHTML);
+    result_list.classList.remove("hidden");
+}, false);
+
+main_input.addEventListener("focusout",function(event) {
+    console.log("Fokusout");
+    result_list.classList.add("hidden");
 }, false);
 
 function copytoclipboard(text){

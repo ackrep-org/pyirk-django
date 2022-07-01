@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
 from django.template.loader import get_template
+from django.db.models import Q
 import pyerk
 
 from ipydex import IPS
@@ -41,7 +42,7 @@ def get_item(request):
 
     payload = []
     if q:
-        items = Item.objects.filter(label__icontains=q)
+        items = Item.objects.filter(Q(label__icontains=q) | Q(key_str__icontains=q))
 
         for db_item in items:
             db_item: Item
