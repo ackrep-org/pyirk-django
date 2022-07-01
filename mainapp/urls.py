@@ -6,6 +6,7 @@ urlpatterns = [
     path('', views.home_page_view, name='landingpage'),
     path('form/<int:form_data_len>', views.home_page_view, name='landingpage_with_form_data'),
     path(r'debug', views.debug_view, name='debugpage0'),
+    path(r'mockup', views.mockup, name='mockuppage'),
     path(r'search/', views.get_item, name='search'),
     path(r'debug/<int:xyz>', views.debug_view, name='debugpage_with_argument'),
 ]

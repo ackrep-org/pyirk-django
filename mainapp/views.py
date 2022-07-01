@@ -56,6 +56,16 @@ def get_item(request):
     return JsonResponse({"status": 200, "data": payload})
 
 
+def mockup(request):
+
+    # TODO: in the future this should not be triggered on every page refresh
+    reload_data()
+
+    context = dict(greeting_message="Hello, World!")
+
+    return render(request, 'mainapp/searchresult-test.html', context)
+
+
 def debug_view(request, xyz=0):
 
     z = 1
