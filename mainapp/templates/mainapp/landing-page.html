@@ -182,7 +182,10 @@ main_input.addEventListener("focusin",function(event) {
 
 main_input.addEventListener("focusout",function(event) {
     console.log("Fokusout");
-    result_list.classList.add("hidden");
+    setTimeout(function(){
+        result_list.classList.add("hidden");
+    }, 200);
+
 }, false);
 
 function copytoclipboard(text){
