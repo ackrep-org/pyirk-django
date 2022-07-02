@@ -42,7 +42,7 @@ def home_page_view(request):
 
     context = dict(greeting_message="Hello, World!")
 
-    return render(request, 'mainapp/main.html', context)
+    return render(request, 'mainapp/landing-page.html', context)
 
 
 # /search/?q=...
@@ -72,7 +72,7 @@ def mockup(request):
 
     context = dict(greeting_message="Hello, World!")
 
-    return render(request, 'mainapp/searchresult-test.html', context)
+    return render(request, 'mainapp/searchresult-test-page.html', context)
 
 
 def entity_view(request, key_str=None):
@@ -86,7 +86,7 @@ def entity_view(request, key_str=None):
     rendered_entity = template.render(context=ctx)
 
     context = dict(rendered_entity=rendered_entity, entity=db_entity)
-    return render(request, 'mainapp/entity-detail.html', context)
+    return render(request, 'mainapp/entity-detail-page.html', context)
 
 
 def debug_view(request, xyz=0):
