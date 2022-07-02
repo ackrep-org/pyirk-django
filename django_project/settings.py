@@ -134,7 +134,7 @@ SITE_ID = 1
 
 BLEACH_ALLOWED_TAGS = ['p', 'b', 'i', 'u', 'em', 'strong', 'a',
                        'h1', 'h2', 'h3', 'h4', 'h5', 'ul', 'ol', 'li', 'pre', 'code', 'script',
-                       'table', 'th', 'tr', 'td', 'thead', 'tbody']
+                       'table', 'th', 'tr', 'td', 'thead', 'tbody', 'div', 'span']
 
 
 def allow_attributes(tag, name, value):
@@ -145,6 +145,8 @@ def allow_attributes(tag, name, value):
     see also: https://bleach.readthedocs.io/en/latest/clean.html#allowed-tags-tags
     """
     if name in ['href', 'title', 'style']:
+        return True
+    elif tag in ("span", "div") and name == "class":
         return True
     elif tag == "script" and name == "type" and value.startswith("math/tex"):
         return True

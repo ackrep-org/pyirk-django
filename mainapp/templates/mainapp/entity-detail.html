@@ -1,0 +1,12 @@
+{% extends "mainapp/base.html" %}
+{% load bleach_tags %}
+
+{% block title %}Details for Entity {{entity.key_str}}{% endblock %}
+{% block content %}
+<h1>Details for Entity</h1>
+
+
+{{rendered_entity|bleach}}
+
+
+{% endblock %}

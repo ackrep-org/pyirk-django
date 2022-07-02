@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
 from django.template.loader import get_template
 from django.db.models import Q
@@ -75,6 +75,20 @@ def mockup(request):
     return render(request, 'mainapp/searchresult-test.html', context)
 
 
+def entity_view(request, key_str=None):
+    db_entity = get_object_or_404(Entity, key_str=key_str)
+    template = get_template("mainapp/entity-list-entry.html")
+    ctx = {
+        "key_str": db_entity.key_str,
+        "label": db_entity.label,
+        "description": db_entity.description,
+    }
+    rendered_entity = template.render(context=ctx)
+
+    context = dict(rendered_entity=rendered_entity, entity=db_entity)
+    return render(request, 'mainapp/entity-detail.html', context)
+
+
 def debug_view(request, xyz=0):
 
     z = 1
@@ -86,4 +100,4 @@ def debug_view(request, xyz=0):
     elif xyz == 2:
         return HttpResponseServerError("Errormessage")
 
-    return HttpResponse('Some plain message')
+    return HttpResponse(f'Some plain message {xyz}')
