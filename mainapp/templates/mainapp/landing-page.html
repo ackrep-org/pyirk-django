@@ -35,7 +35,8 @@ const info = document.getElementById("result-info");
 main_input.setSelectionRange(main_input.value.length, main_input.value.length);
 main_input.focus()
 
-main_input.addEventListener("input", async function(){
+
+async function input_callback(){
     const query = main_input.value;
     const url = `/search/?q=${main_input.value}`;
     const source = await fetch(url);
@@ -62,7 +63,15 @@ main_input.addEventListener("input", async function(){
             result_list.appendChild(li);
         })
     }
-});
+}
+
+
+main_input.addEventListener("input", input_callback);
+
+// if we reload the page with content in the input, the result should be shown directly
+if (main_input.value.length != 0) {
+    input_callback();
+}
 
 /*
 
