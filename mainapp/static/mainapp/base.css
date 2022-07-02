@@ -49,6 +49,10 @@ body a:hover{
     background-color: #FAFAFA;
 }
 
+.main h1 {
+    font-size: 1.5rem;
+}
+
 /* copied classes*/
 
 .autoComplete_wrapper input {
