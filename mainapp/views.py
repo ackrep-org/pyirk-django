@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
 from django.template.loader import get_template
+from django.urls import reverse
 from django.db.models import Q
 import pyerk
 
@@ -55,12 +56,14 @@ def get_item(request):
     if q:
         entities = Entity.objects.filter(Q(label__icontains=q) | Q(key_str__icontains=q))
 
-        for db_entity in entities:
+        for idx, db_entity in enumerate(entities):
             db_entity: Entity
             ctx = {
                 "key_str": db_entity.key_str,
                 "label": db_entity.label,
                 "description": db_entity.description,
+                "url": reverse("entitypage", kwargs={"key_str": db_entity.key_str}),
+                "idx": idx
             }
             rendered_entity = template.render(context=ctx)
             payload.append(rendered_entity)
@@ -69,8 +72,19 @@ def get_item(request):
 
 
 def mockup(request):
+    db_entity = get_object_or_404(Entity, key_str="I5")
+    template = get_template("mainapp/entity-list-entry.html")
+    ctx = {
+        "key_str": db_entity.key_str,
+        "label": db_entity.label,
+        "description": db_entity.description,
+        "url": reverse("entitypage", kwargs={"key_str": db_entity.key_str}),
+        "idx": 23
+    }
 
-    context = dict(greeting_message="Hello, World!")
+    rendered_entity = template.render(context=ctx)
+
+    context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
 
     return render(request, 'mainapp/searchresult-test-page.html', context)
 

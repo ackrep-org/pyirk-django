@@ -134,10 +134,17 @@ main_input.addEventListener('keydown', function(event) {
     liSelected.classList.add("selected");
     console.log(`classList2-: ${liSelected.classList}`);
   } else if (event.which === 13 &&event.shiftKey && liSelected ) {
+    //
     // Shift + Enter
-    console.log(`Shift Enter-->${liSelected.innerHTML}`);
+    //
+    var url = JSON.parse(document.getElementById(`result_url_${index}`).textContent);
+
+    console.log(`Shift Enter-->url: ${url}`);
+    window.location.assign(url);
   } else if (event.which === 13 && liSelected ) {
+    //
     // Enter
+    //
     console.log(`Enter-->${liSelected.innerHTML}`);
     copytoclipboard(liSelected.innerHTML);
     liSelected.classList.add("copied");

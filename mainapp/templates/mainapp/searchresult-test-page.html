@@ -31,6 +31,16 @@
         abcd
     </div>
 
+    {{ "https://startpage.com"|json_script:"target_url" }}
+
+    <script>
+
+        var target_url = JSON.parse(document.getElementById('target_url').textContent);
+        console.log(target_url)
+        //window.location.replace(target_url);
+    </script>
+
+
     <p>
     Search Item:
     </p>
@@ -44,6 +54,9 @@
             <p id="result-info">
                 Displaying <b>30</b> results
             </p>
+                <li>
+                    {{rendered_entity}}
+                </li>
                 <li>
                     <div class="entity-label">Label Label Label </div>
                     <div class="entity-description">

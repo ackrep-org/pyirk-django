@@ -1,4 +1,8 @@
 {% load bleach_tags %}
 
+
+{# |json_script does not work here beause the id is also data-dependent#}
+
+<script id="result_url_{{idx}}" type="application/json">"{{url}}"</script>
 <div class="entity-label">&lt;{{key_str}}&gt; {{label|bleach}}</div>
 <div class="entity-description">{{description|bleach}}</div>
