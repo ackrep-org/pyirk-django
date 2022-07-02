@@ -6,21 +6,32 @@ import pyerk
 
 from ipydex import IPS
 
-from .models import Item
+from .models import Entity
 
 
 def reload_data():
+    """
+    Load data from python-module into data base to allow simple searching
+    :return:
+    """
 
     # delete all existing data
-    Item.objects.all().delete()
+    Entity.objects.all().delete()
 
     mod = pyerk.erkloader.load_mod_from_path("../controltheory_experiments/knowledge_base1.py", "knowledge_base1")
 
     for itm in pyerk.ds.items.values():
-        Item.objects.create(
+        Entity.objects.create(
             key_str=itm.short_key,
             label=getattr(itm, "R1", None),
             description=getattr(itm, "R2", None),
+        )
+
+    for rel in pyerk.ds.relations.values():
+        Entity.objects.create(
+            key_str=rel.short_key,
+            label=getattr(rel, "R1", None),
+            description=getattr(rel, "R2", None),
         )
 
 
@@ -42,25 +53,22 @@ def get_item(request):
 
     payload = []
     if q:
-        items = Item.objects.filter(Q(label__icontains=q) | Q(key_str__icontains=q))
+        entities = Entity.objects.filter(Q(label__icontains=q) | Q(key_str__icontains=q))
 
-        for db_item in items:
-            db_item: Item
+        for db_entity in entities:
+            db_entity: Entity
             ctx = {
-                "key_str": db_item.key_str,
-                "label": db_item.label,
-                "description": db_item.description,
+                "key_str": db_entity.key_str,
+                "label": db_entity.label,
+                "description": db_entity.description,
             }
-            rendered_item = template.render(context=ctx)
-            payload.append(rendered_item)
+            rendered_entity = template.render(context=ctx)
+            payload.append(rendered_entity)
 
     return JsonResponse({"status": 200, "data": payload})
 
 
 def mockup(request):
-
-    # TODO: in the future this should not be triggered on every page refresh
-    # reload_data()
 
     context = dict(greeting_message="Hello, World!")
 
