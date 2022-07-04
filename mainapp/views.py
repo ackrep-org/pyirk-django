@@ -75,7 +75,11 @@ def entity_view(request, key_str=None):
 def render_entity_relations(db_entity: Entity) -> str:
     template = get_template("mainapp/entity-relations.html")
 
-    relation_edges = pyerk.ds.relation_edges[db_entity.key_str]
+    # omit information which is already displayed by render_entity (label, description)
+    black_listed_keys = ["R1", "R2"]
+
+    relation_edges0 = pyerk.ds.relation_edges[db_entity.key_str]
+    relation_edges = [re for re in relation_edges0 if re.relation.short_key not in black_listed_keys]
 
     ctx = {
         "relation_edges": relation_edges,

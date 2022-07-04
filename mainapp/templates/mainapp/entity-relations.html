@@ -5,14 +5,18 @@
 {% for rl_edg in relation_edges %}
 <div class="entity-relation-edge">
 
-    {{rl_edg|get_obj_attr_chain:"relation:short_key"}}("{{rl_edg|get_obj_attr_chain:"relation:R1"}}") →
-    {% if rl_edg.corresponding_entity %}
+    · {{rl_edg|get_obj_attr_chain:"relation:short_key"}}("{{rl_edg|get_obj_attr_chain:"relation:R1"}}") →
+    {% if rl_edg|get_obj_attr:"corresponding_entity" %}
         <a href="{% url 'entitypage' rl_edg|get_obj_attr_chain:'corresponding_entity:short_key' %}">
             {{rl_edg|get_obj_attr_chain:"corresponding_entity:short_key"}}
-        </a>{{rl_edg|get_obj_attr_chain:"corresponding_entity:R1"}}
+        </a>("{{rl_edg|get_obj_attr_chain:"corresponding_entity:R1"}}")
     {% else %}
         <span class="literal">{{rl_edg.corresponding_literal}}</span>
     {% endif %}
 </div>
-
 {% endfor %}
+
+{% if not relation_edges %}
+
+no relations found
+{% endif %}
