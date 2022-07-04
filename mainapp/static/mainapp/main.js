@@ -60,7 +60,6 @@ https://www.toptal.com/developers/keycode/for/l
 // source: https://codepen.io/mehuldesign/pen/eYpbXMg
 var liSelected;
 var index = -1;
-var main_input_was_focused = false;
 
 // keyboard shortcuts for input (arrow keys + Enter)
 main_input.addEventListener('keydown', function(event) {
@@ -152,20 +151,20 @@ main_input.addEventListener("focusin",function(event) {
     console.log("Focus");
     //console.log(result_list.innerHTML);
     result_list.classList.remove("hidden");
-    main_input_was_focused = true;
 }, false);
 
 main_input.addEventListener("focusout",function(event) {
     console.log("Focusout");
-    if (main_input_was_focused == true) {
-        setTimeout(function(){
-            result_list.classList.add("hidden");
-        }, 200);
-    } else {
-        console.log("do nothing");
-    }
+    setTimeout(hide_result_list, 200);
 
 }, false);
+
+function hide_result_list(){
+    // if result_list is not focused then hide it
+    if (document.activeElement != main_input) {
+        result_list.classList.add("hidden");
+    }
+}
 
 function copytoclipboard(text){
 
