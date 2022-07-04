@@ -1,31 +1,8 @@
-<!DOCTYPE html>
-{% load static %}
-{% load extra_filters %}
+{% extends "mainapp/base.html" %}
 {% load bleach_tags %}
 
-
-<html>
-<head lang="en">
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-
-<!--  prevent favicon -->
-<link rel="icon" href="data:,">
-
-
-<!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.min.css">-->
-<link type="text/css" rel="stylesheet" href="{% static 'mainapp/base.css' %}">
-
-
-<title>Search Page Test Mockup</title>
-
-</head>
-
-<body>
-<!--utc_landing_page-->
-
-<div class="main">
+{% block title %}Search Page Test Mockup{% endblock %}
+{% block content %}
 
     <div  class="ac_input_wrapper">
         abcd
@@ -95,11 +72,4 @@
     Das ist weiterer Text der geht gleich weiter.
     Das ist weiterer Text der geht gleich weiter.
     </p>
-</div>
-
-
-</body>
-</html>
-
-
-
+{% endblock %}

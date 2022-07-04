@@ -6,7 +6,6 @@
 
 
 {% block content %}
-<h1>ERK: Easy Representation of Knowledge</h1>
 
     Search Item:
 
@@ -154,8 +153,9 @@ main_input.addEventListener('keydown', function(event) {
     //
     // Enter
     //
-    console.log(`Enter-->${liSelected.innerHTML}`);
-    copytoclipboard(liSelected.innerHTML);
+    var copy_text = JSON.parse(document.getElementById(`copy_text_${index}`).textContent);
+    console.log(`Enter--> copy ${copy_text}`);
+    copytoclipboard(copy_text);
     liSelected.classList.add("copied");
   } else if (event.which === 27) {
     // ESC

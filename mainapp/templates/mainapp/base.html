@@ -22,6 +22,9 @@
 <body>
 
 <div class="main">
+{% block page-header %}
+    <a href="{% url 'landingpage' %}"><h1>ERK: Easy Representation of Knowledge</h1></a>
+{% endblock %}
 
 {% block content %}
 {% endblock %}
