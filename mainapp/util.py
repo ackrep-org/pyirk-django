@@ -2,7 +2,7 @@ import pyerk
 from .models import Entity
 
 
-def reload_data():
+def reload_data(omit_reload=False):
     """
     Load data from python-module into data base to allow simple searching
     :return:
@@ -11,7 +11,11 @@ def reload_data():
     # delete all existing data
     Entity.objects.all().delete()
 
-    mod = pyerk.erkloader.load_mod_from_path("../controltheory_experiments/knowledge_base1.py", "knowledge_base1")
+    mod = pyerk.erkloader.load_mod_from_path(
+        "../controltheory_experiments/knowledge_base1.py",
+        "knowledge_base1",
+        omit_reload=omit_reload
+    )
 
     for itm in pyerk.ds.items.values():
         Entity.objects.create(

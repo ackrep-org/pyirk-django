@@ -43,13 +43,7 @@ class TestMainApp1(TestCase):
                 tag.name = "script"
         txt2 = str(bs)
 
-        IPS()
-        return
-
-
-        url = reverse("entitypage", kwargs=dict(key_str="I15"))
+        url = reverse("entitypage", kwargs=dict(key_str="I3007"))
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
-
-
 

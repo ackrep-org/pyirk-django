@@ -14,7 +14,7 @@ from .models import Entity
 def home_page_view(request):
 
     # TODO: in the future this should not be triggered on every page refresh
-    util.reload_data()
+    util.reload_data(omit_reload=True)
 
     context = dict(greeting_message="Hello, World!")
 
@@ -39,6 +39,10 @@ def get_item(request):
 
 
 def render_entity(db_entity: Entity, idx, script_tag="myscript") -> str:
+
+    if isinstance(db_entity, str):
+        db_entity = get_object_or_404(Entity, key_str=db_entity)
+
     template = get_template("mainapp/entity-list-entry.html")
     ctx = {
         "key_str": db_entity.key_str,
@@ -61,14 +65,20 @@ def mockup(request):
 
 
 def entity_view(request, key_str=None):
+
+    # TODO: in the future this should not be triggered on every page refresh
+    util.reload_data(omit_reload=True)
+
     db_entity = get_object_or_404(Entity, key_str=key_str)
     rendered_entity = render_entity(db_entity, idx=0, script_tag="myscript")
     rendered_entity_relations = render_entity_relations(db_entity)
+    rendered_entity_context_vars = render_entity_context_vars(db_entity)
 
     context = dict(
         rendered_entity=rendered_entity,
         entity=db_entity,
-        rendered_entity_relations=rendered_entity_relations
+        rendered_entity_relations=rendered_entity_relations,
+        rendered_entity_context_vars=rendered_entity_context_vars,
     )
     return render(request, 'mainapp/entity-detail-page.html', context)
 
@@ -86,7 +96,25 @@ def render_entity_relations(db_entity: Entity) -> str:
         "relation_edges": relation_edges,
     }
     render_result = template.render(context=ctx)
-    # IPS()
+    return render_result
+
+
+def render_entity_context_vars(db_entity: Entity) -> str:
+    template = get_template("mainapp/entity-context-vars.html")
+    code_entity = pyerk.ds.get_entity(db_entity.key_str)
+    context_vars0 = getattr(code_entity, "_context_vars", dict()).items()
+
+    context_vars = []
+    for i, (name, var) in enumerate(context_vars0):
+        if isinstance(var, pyerk.GenericInstance):
+            context_vars.append((name, "GenericInstance of", render_entity(var.cls.short_key, i, script_tag=None)))
+        else:
+            context_vars.append((name, "is", render_entity(var.cls.short_key, i)))
+
+    ctx = {
+        "context_vars": context_vars
+    }
+    render_result = template.render(context=ctx)
     return render_result
 
 
