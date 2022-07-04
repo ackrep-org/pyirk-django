@@ -4,42 +4,17 @@ from django.template.loader import get_template
 from django.urls import reverse
 from django.db.models import Q
 import pyerk
+from . import util
 
 from ipydex import IPS
 
 from .models import Entity
 
 
-def reload_data():
-    """
-    Load data from python-module into data base to allow simple searching
-    :return:
-    """
-
-    # delete all existing data
-    Entity.objects.all().delete()
-
-    mod = pyerk.erkloader.load_mod_from_path("../controltheory_experiments/knowledge_base1.py", "knowledge_base1")
-
-    for itm in pyerk.ds.items.values():
-        Entity.objects.create(
-            key_str=itm.short_key,
-            label=getattr(itm, "R1", None),
-            description=getattr(itm, "R2", None),
-        )
-
-    for rel in pyerk.ds.relations.values():
-        Entity.objects.create(
-            key_str=rel.short_key,
-            label=getattr(rel, "R1", None),
-            description=getattr(rel, "R2", None),
-        )
-
-
 def home_page_view(request):
 
     # TODO: in the future this should not be triggered on every page refresh
-    reload_data()
+    util.reload_data()
 
     context = dict(greeting_message="Hello, World!")
 
@@ -87,8 +62,27 @@ def mockup(request):
 def entity_view(request, key_str=None):
     db_entity = get_object_or_404(Entity, key_str=key_str)
     rendered_entity = render_entity(db_entity, idx=0)
-    context = dict(rendered_entity=rendered_entity, entity=db_entity)
+    rendered_entity_relations = render_entity_relations(db_entity)
+
+    context = dict(
+        rendered_entity=rendered_entity,
+        entity=db_entity,
+        rendered_entity_relations=rendered_entity_relations
+    )
     return render(request, 'mainapp/entity-detail-page.html', context)
+
+
+def render_entity_relations(db_entity: Entity) -> str:
+    template = get_template("mainapp/entity-relations.html")
+
+    relation_edges = pyerk.ds.relation_edges[db_entity.key_str]
+
+    ctx = {
+        "relation_edges": relation_edges,
+    }
+    render_result = template.render(context=ctx)
+    # IPS()
+    return render_result
 
 
 def debug_view(request, xyz=0):
