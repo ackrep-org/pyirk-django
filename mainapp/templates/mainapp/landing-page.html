@@ -87,6 +87,7 @@ https://www.toptal.com/developers/keycode/for/l
 // source: https://codepen.io/mehuldesign/pen/eYpbXMg
 var liSelected;
 var index = -1;
+var main_input_was_focused = false;
 
 // keyboard shortcuts for input (arrow keys + Enter)
 main_input.addEventListener('keydown', function(event) {
@@ -176,15 +177,20 @@ document.addEventListener('keydown', function(event) {
 
 main_input.addEventListener("focusin",function(event) {
     console.log("Focus");
-    console.log(result_list.innerHTML);
+    //console.log(result_list.innerHTML);
     result_list.classList.remove("hidden");
+    main_input_was_focused = true;
 }, false);
 
 main_input.addEventListener("focusout",function(event) {
-    console.log("Fokusout");
-    setTimeout(function(){
-        result_list.classList.add("hidden");
-    }, 200);
+    console.log("Focusout");
+    if (main_input_was_focused == true) {
+        setTimeout(function(){
+            result_list.classList.add("hidden");
+        }, 200);
+    } else {
+        console.log("do nothing");
+    }
 
 }, false);
 
