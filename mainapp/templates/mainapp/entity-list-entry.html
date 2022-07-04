@@ -2,9 +2,10 @@
 
 
 {# |json_script does not work here beause the id is also data-dependent#}
+{# also we have to use < script > or < myscript > depending on target. → var script_tag #}
 
-<script id="result_url_{{idx}}" type="application/json">"{{url}}"</script>
-<script id="copy_text_{{idx}}" type="application/json">"{{key_str}}(\"{{label}}\")"</script>
+<{{script_tag}} id="result_url_{{idx}}" type="application/json">"{{url}}"</{{script_tag}}>
+<{{script_tag}} id="copy_text_{{idx}}" type="application/json">"{{key_str}}(\"{{label}}\")"</{{script_tag}}>
 
 <div class="entity-label">
     <a href="{{url}}">{{key_str}}</a>("{{label|bleach}}")

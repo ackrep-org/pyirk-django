@@ -39,3 +39,16 @@ def get_obj_attr_chain(obj0, chained_attrs):
     for attr in attr_names:
         obj = getattr(obj, attr)
     return obj
+
+
+@register.filter(is_safe=True)
+def allow_json_script(src):
+    """
+    This is intended to run after bleach (which fully allows `myscript`-tags)
+    :param src:
+    :return:
+    """
+
+    # TODO: introduce safety checks with beautiful soup
+    return src.replace("myscript", "script")
+

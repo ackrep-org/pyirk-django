@@ -33,19 +33,20 @@ def get_item(request):
         for idx, db_entity in enumerate(entities):
             db_entity: Entity
 
-            payload.append(render_entity(db_entity, idx))
+            payload.append(render_entity(db_entity, idx, script_tag="script"))
 
     return JsonResponse({"status": 200, "data": payload})
 
 
-def render_entity(db_entity: Entity, idx) -> str:
+def render_entity(db_entity: Entity, idx, script_tag="myscript") -> str:
     template = get_template("mainapp/entity-list-entry.html")
     ctx = {
         "key_str": db_entity.key_str,
         "label": db_entity.label,
         "description": db_entity.description,
         "url": reverse("entitypage", kwargs={"key_str": db_entity.key_str}),
-        "idx": idx
+        "idx": idx,
+        "script_tag": script_tag,
     }
     rendered_entity = template.render(context=ctx)
     return rendered_entity
@@ -53,7 +54,7 @@ def render_entity(db_entity: Entity, idx) -> str:
 
 def mockup(request):
     db_entity = get_object_or_404(Entity, key_str="I5")
-    rendered_entity = render_entity(db_entity, idx=23)
+    rendered_entity = render_entity(db_entity, idx=23, script_tag="script")
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
 
     return render(request, 'mainapp/searchresult-test-page.html', context)
@@ -61,7 +62,7 @@ def mockup(request):
 
 def entity_view(request, key_str=None):
     db_entity = get_object_or_404(Entity, key_str=key_str)
-    rendered_entity = render_entity(db_entity, idx=0)
+    rendered_entity = render_entity(db_entity, idx=0, script_tag="myscript")
     rendered_entity_relations = render_entity_relations(db_entity)
 
     context = dict(

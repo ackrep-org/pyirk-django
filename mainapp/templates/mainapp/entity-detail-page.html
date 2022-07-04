@@ -1,12 +1,13 @@
 {% extends "mainapp/base.html" %}
 {% load bleach_tags %}
+{% load extra_filters %}
 
 {% block title %}Details for Entity {{entity.key_str}}{% endblock %}
 {% block content %}
 <h1>Details for Entity</h1>
 
 
-{{rendered_entity|bleach}}
+{{rendered_entity|bleach|allow_json_script}}
 <hr style="margin:1rem;">
 {{rendered_entity_relations|bleach}}
 

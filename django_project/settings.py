@@ -133,7 +133,7 @@ STATIC_URL = '/static/'
 SITE_ID = 1
 
 BLEACH_ALLOWED_TAGS = ['p', 'b', 'i', 'u', 'em', 'strong', 'a',
-                       'h1', 'h2', 'h3', 'h4', 'h5', 'ul', 'ol', 'li', 'pre', 'code', 'script',
+                       'h1', 'h2', 'h3', 'h4', 'h5', 'ul', 'ol', 'li', 'pre', 'code', 'myscript',
                        'table', 'th', 'tr', 'td', 'thead', 'tbody', 'div', 'span']
 
 
@@ -148,7 +148,14 @@ def allow_attributes(tag, name, value):
         return True
     elif tag in ("span", "div") and name == "class":
         return True
-    elif tag == "script" and name == "type" and value.startswith("math/tex"):
+    # elif tag == "script" and name == "type" and value.startswith("math/tex"):
+    #     return True
+    elif tag == "myscript":
+        # Unfortunately, bleach checks every tag separately. To allow `<script type="application/json">
+        # script has to be allowed in general. If the type-attributedoes not match the rule then only
+        # the attribute is stripped, leaving potential harmful code inside <script>.
+
+        # Thus we introduce a fake tag `myscipt` which will be handled and checked by a custom filter
         return True
     else:
         return False
