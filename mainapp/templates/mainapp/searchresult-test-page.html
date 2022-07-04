@@ -1,4 +1,5 @@
 {% extends "mainapp/base.html" %}
+{% load static %}
 {% load bleach_tags %}
 
 {% block title %}Search Page Test Mockup{% endblock %}
@@ -31,6 +32,60 @@
             <p id="result-info">
                 Displaying <b>30</b> results
             </p>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
+                <li>
+                    {{rendered_entity}}
+                </li>
                 <li>
                     {{rendered_entity}}
                 </li>
@@ -72,4 +127,10 @@
     Das ist weiterer Text der geht gleich weiter.
     Das ist weiterer Text der geht gleich weiter.
     </p>
+{% endblock %}
+
+
+
+{% block script %}
+<script type="text/javascript" src="{% static 'mainapp/main.js' %}"></script>
 {% endblock %}

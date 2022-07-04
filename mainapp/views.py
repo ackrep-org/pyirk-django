@@ -50,7 +50,6 @@ def home_page_view(request):
 def get_item(request):
 
     q = request.GET.get("q")
-    template = get_template("mainapp/entity-list-entry.html")
 
     payload = []
     if q:
@@ -58,32 +57,28 @@ def get_item(request):
 
         for idx, db_entity in enumerate(entities):
             db_entity: Entity
-            ctx = {
-                "key_str": db_entity.key_str,
-                "label": db_entity.label,
-                "description": db_entity.description,
-                "url": reverse("entitypage", kwargs={"key_str": db_entity.key_str}),
-                "idx": idx
-            }
-            rendered_entity = template.render(context=ctx)
-            payload.append(rendered_entity)
+
+            payload.append(render_entity(db_entity, idx))
 
     return JsonResponse({"status": 200, "data": payload})
 
 
-def mockup(request):
-    db_entity = get_object_or_404(Entity, key_str="I5")
+def render_entity(db_entity: Entity, idx) -> str:
     template = get_template("mainapp/entity-list-entry.html")
     ctx = {
         "key_str": db_entity.key_str,
         "label": db_entity.label,
         "description": db_entity.description,
         "url": reverse("entitypage", kwargs={"key_str": db_entity.key_str}),
-        "idx": 23
+        "idx": idx
     }
-
     rendered_entity = template.render(context=ctx)
+    return rendered_entity
 
+
+def mockup(request):
+    db_entity = get_object_or_404(Entity, key_str="I5")
+    rendered_entity = render_entity(db_entity, idx=23)
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
 
     return render(request, 'mainapp/searchresult-test-page.html', context)
@@ -91,14 +86,7 @@ def mockup(request):
 
 def entity_view(request, key_str=None):
     db_entity = get_object_or_404(Entity, key_str=key_str)
-    template = get_template("mainapp/entity-list-entry.html")
-    ctx = {
-        "key_str": db_entity.key_str,
-        "label": db_entity.label,
-        "description": db_entity.description,
-    }
-    rendered_entity = template.render(context=ctx)
-
+    rendered_entity = render_entity(db_entity, idx=0)
     context = dict(rendered_entity=rendered_entity, entity=db_entity)
     return render(request, 'mainapp/entity-detail-page.html', context)
 
