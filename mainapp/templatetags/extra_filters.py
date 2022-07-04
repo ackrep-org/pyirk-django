@@ -2,6 +2,7 @@ from django import template
 
 import markdown
 import mdx_math
+from bs4 import BeautifulSoup
 
 register = template.Library()
 
@@ -49,6 +50,10 @@ def allow_json_script(src):
     :return:
     """
 
-    # TODO: introduce safety checks with beautiful soup
-    return src.replace("myscript", "script")
+    bs = BeautifulSoup(src, 'html.parser')
+    res = bs.find_all("myscript")
+    for tag in res:
+        if tag.attrs.get("type") == "application/json":
+            tag.name = "script"
+    return str(bs)
 
