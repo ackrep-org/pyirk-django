@@ -72,13 +72,15 @@ def entity_view(request, key_str=None):
     db_entity = get_object_or_404(Entity, key_str=key_str)
     rendered_entity = render_entity(db_entity, idx=0, script_tag="myscript")
     rendered_entity_relations = render_entity_relations(db_entity)
-    rendered_entity_context_vars = render_entity_context_vars(db_entity)
+    # rendered_entity_context_vars = render_entity_context_vars(db_entity)
+    rendered_entity_namespaces = render_entity_namespaces(db_entity)
 
     context = dict(
         rendered_entity=rendered_entity,
         entity=db_entity,
         rendered_entity_relations=rendered_entity_relations,
-        rendered_entity_context_vars=rendered_entity_context_vars,
+        # rendered_entity_context_vars=rendered_entity_context_vars,
+        rendered_entity_namespaces=rendered_entity_namespaces,
     )
     return render(request, 'mainapp/entity-detail-page.html', context)
 
@@ -99,6 +101,22 @@ def render_entity_relations(db_entity: Entity) -> str:
     return render_result
 
 
+def render_entity_namespaces(db_entity: Entity) -> str:
+    template = get_template("mainapp/entity-namespaces.html")
+    code_entity = pyerk.ds.get_entity(db_entity.key_str)
+    # noinspection PyProtectedMember
+    for ns_name, ns in code_entity._namespaces.items():
+        pass
+    # noinspection PyProtectedMember
+    ctx = {
+        "namespaces": code_entity._namespaces
+    }
+
+    render_result = template.render(context=ctx)
+    return render_result
+
+
+# TODO: obsolete?
 def render_entity_context_vars(db_entity: Entity) -> str:
     template = get_template("mainapp/entity-context-vars.html")
     code_entity = pyerk.ds.get_entity(db_entity.key_str)

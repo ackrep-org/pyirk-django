@@ -57,3 +57,22 @@ def allow_json_script(src):
             tag.name = "script"
     return str(bs)
 
+
+@register.filter
+def dicttype(arg: dict) -> str:
+    """
+    Determine some special dict structures from within the template
+
+    :param arg:     a dict
+    :return:
+    """
+    if len(arg) == 1:
+        key, value = tuple(arg.items())[0]
+        if isinstance(value, (list, tuple)):
+            return "l1:list"
+        else:
+            return "l1"
+    else:
+        return "dict"
+
+

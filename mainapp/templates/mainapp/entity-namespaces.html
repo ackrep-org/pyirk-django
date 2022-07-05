@@ -1,0 +1,27 @@
+{% load extra_filters %}
+
+Namespaces:
+
+{% if namespaces %}
+{% for ns_name, ns in namespaces.items %}
+    Namespace <b>{{ns_name}}</b><br>
+    {% if ns|dicttype == "l1:list" %}
+        {# This loop will run just once but still it seems to be the easiest way to unpack this l1-dict #}
+        {% for foo, content_list in ns.items %}
+
+            {% for elt in content_list %}
+                {{elt}}
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        {# not a length-1-dict-containing a list #}
+        {% for key, value in ns.items %}
+            <div>
+            <i>{{key}}</i>
+            {{value}}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+{% endif %}
+
