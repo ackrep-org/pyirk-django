@@ -91,8 +91,11 @@ def render_entity_relations(db_entity: Entity) -> str:
     # omit information which is already displayed by render_entity (label, description)
     black_listed_keys = ["R1", "R2"]
 
+    # dict like {"R1": [<RelationEdge 1234>, ...], "R2": [...]}
     relation_edges0 = pyerk.ds.relation_edges[db_entity.key_str]
-    relation_edges = [re for re in relation_edges0 if re.relation.short_key not in black_listed_keys]
+
+    # create a flat list
+    relation_edges = [re for key, re_list in relation_edges0.items() if key not in black_listed_keys for re in re_list]
 
     ctx = {
         "relation_edges": relation_edges,
@@ -117,6 +120,7 @@ def render_entity_namespaces(db_entity: Entity) -> str:
 
 
 # TODO: obsolete?
+"""
 def render_entity_context_vars(db_entity: Entity) -> str:
     template = get_template("mainapp/entity-context-vars.html")
     code_entity = pyerk.ds.get_entity(db_entity.key_str)
@@ -134,6 +138,7 @@ def render_entity_context_vars(db_entity: Entity) -> str:
     }
     render_result = template.render(context=ctx)
     return render_result
+"""
 
 
 def debug_view(request, xyz=0):

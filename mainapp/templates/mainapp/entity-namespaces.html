@@ -8,10 +8,11 @@ Namespaces:
     {% if ns|dicttype == "l1:list" %}
         {# This loop will run just once but still it seems to be the easiest way to unpack this l1-dict #}
         {% for foo, content_list in ns.items %}
-
+            <ul>
             {% for elt in content_list %}
-                {{elt}}
+                <li>{{elt}}</li>
             {% endfor %}
+            </ul>
         {% endfor %}
     {% else %}
         {# not a length-1-dict-containing a list #}
