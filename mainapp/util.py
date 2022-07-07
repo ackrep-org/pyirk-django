@@ -2,20 +2,24 @@ import pyerk
 from .models import Entity
 
 
-def reload_data(omit_reload=False):
+def reload_data(omit_reload=False) -> None:
     """
     Load data from python-module into data base to allow simple searching
     :return:
     """
-
-    # delete all existing data
-    Entity.objects.all().delete()
 
     mod = pyerk.erkloader.load_mod_from_path(
         "../controltheory_experiments/knowledge_base1.py",
         "knowledge_base1",
         omit_reload=omit_reload
     )
+
+    if mod is None:
+        # this was an omited reload
+        return
+
+    # delete all existing data
+    Entity.objects.all().delete()
 
     for itm in pyerk.ds.items.values():
         Entity.objects.create(

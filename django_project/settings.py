@@ -132,7 +132,7 @@ STATIC_URL = '/static/'
 
 SITE_ID = 1
 
-BLEACH_ALLOWED_TAGS = ['p', 'b', 'i', 'u', 'em', 'strong', 'a', 'br',
+BLEACH_ALLOWED_TAGS = ['p', 'b', 'i', 'u', 'em', 'strong', 'a', 'br', 'hr',
                        'h1', 'h2', 'h3', 'h4', 'h5', 'ul', 'ol', 'li', 'pre', 'code', 'myscript',
                        'table', 'th', 'tr', 'td', 'thead', 'tbody', 'div', 'span']
 
