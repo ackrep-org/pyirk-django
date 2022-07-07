@@ -1,3 +1,4 @@
+from typing import Union
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
 from django.template.loader import get_template
@@ -33,12 +34,12 @@ def get_item(request):
         for idx, db_entity in enumerate(entities):
             db_entity: Entity
 
-            payload.append(render_entity(db_entity, idx, script_tag="script"))
+            payload.append(render_entity_list_entry(db_entity, idx, script_tag="script"))
 
     return JsonResponse({"status": 200, "data": payload})
 
 
-def render_entity(db_entity: Entity, idx, script_tag="myscript") -> str:
+def render_entity_list_entry(db_entity: Entity, idx, script_tag="myscript") -> str:
 
     if isinstance(db_entity, str):
         db_entity = get_object_or_404(Entity, key_str=db_entity)
@@ -58,7 +59,7 @@ def render_entity(db_entity: Entity, idx, script_tag="myscript") -> str:
 
 def mockup(request):
     db_entity = get_object_or_404(Entity, key_str="I5")
-    rendered_entity = render_entity(db_entity, idx=23, script_tag="script")
+    rendered_entity = render_entity_list_entry(db_entity, idx=23, script_tag="script")
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
 
     return render(request, 'mainapp/page-searchresult-test.html', context)
@@ -69,7 +70,7 @@ def entity_view(request, key_str=None):
     util.reload_data(omit_reload=True)
 
     db_entity = get_object_or_404(Entity, key_str=key_str)
-    rendered_entity = render_entity(db_entity, idx=0, script_tag="myscript")
+    rendered_entity = render_entity_inline(db_entity)
     rendered_entity_relations = render_entity_relations(db_entity)
     # rendered_entity_context_vars = render_entity_context_vars(db_entity)
     rendered_entity_scopes = render_entity_scopes(db_entity)
@@ -84,8 +85,19 @@ def entity_view(request, key_str=None):
     return render(request, 'mainapp/page-entity-detail.html', context)
 
 
+def render_entity_inline(db_entity: Entity) -> str:
+
+    entity_dict = represent_entity_as_dict(pyerk.ds.get_entity(db_entity.key_str))
+    template = get_template(entity_dict["template"])
+
+    ctx = {
+        "c": entity_dict
+    }
+    rendered_entity = template.render(context=ctx)
+    return rendered_entity
+
+
 def render_entity_relations(db_entity: Entity) -> str:
-    template = get_template("mainapp/widget-entity-relations.html")
 
     # omit information which is already displayed by render_entity (label, description)
     black_listed_keys = ["R1", "R2"]
@@ -94,11 +106,20 @@ def render_entity_relations(db_entity: Entity) -> str:
     relation_edges0 = pyerk.ds.relation_edges[db_entity.key_str]
 
     # create a flat list
-    relation_edges = [re for key, re_list in relation_edges0.items() if key not in black_listed_keys for re in re_list]
+    re_dict_2tuples = []
+    for key, re_list in relation_edges0.items():
+        if key in black_listed_keys:
+            continue
+        for re in re_list:
+            # index 0 is the subject entity which is not relevant here
+            d1 = represent_entity_as_dict(re.relation_tuple[1])
+            d2 = represent_entity_as_dict(re.relation_tuple[2])
+            re_dict_2tuples.append((d1, d2))
 
     ctx = {
-        "relation_edges": relation_edges,
+        "re_dict_2tuples": re_dict_2tuples,
     }
+    template = get_template("mainapp/widget-entity-relations.html")
     render_result = template.render(context=ctx)
     return render_result
 
@@ -128,9 +149,6 @@ def render_entity_scopes(db_entity: Entity) -> str:
             "defining_relations": defining_relation_triples,
         })
 
-    c = scopes[0]
-    q = pyerk.ds.inv_relation_edges[c.short_key]["R20"][0]
-
     ctx = {
         "scopes": scope_contents
     }
@@ -142,14 +160,22 @@ def render_entity_scopes(db_entity: Entity) -> str:
 
 
 # noinspection PyUnresolvedReferences
-def represent_entity_as_dict(entity: Entity) -> dict:
-    res = {
-        "short_key": entity.short_key,
-        "label": entity.R1,
-        "description": entity.R2,
-        "detail_url": reverse("entitypage", kwargs={"key_str": entity.short_key}),
-        "template": "mainapp/widget-entity-inline.html",
-    }
+def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
+
+    if isinstance(code_entity, pyerk.Entity):
+        res = {
+            "short_key": code_entity.short_key,
+            "label": code_entity.R1,
+            "description": code_entity.R2,
+            "detail_url": reverse("entitypage", kwargs={"key_str": code_entity.short_key}),
+            "template": "mainapp/widget-entity-inline.html",
+        }
+    else:
+        # assume we have a literal
+        res = {
+            "value": repr(code_entity),
+            "template": "mainapp/widget-literal-inline.html",
+        }
 
     return res
 

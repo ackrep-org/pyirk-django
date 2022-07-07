@@ -45,13 +45,11 @@ body a:hover{
     margin-right: auto;
     margin-left: auto;
     width: 90vw;
-    max-width: 35em;
+    max-width: 55em;
     background-color: #FAFAFA;
 }
 
-.main h1 {
-    font-size: 1.5rem;
-}
+
 
 /* copied classes*/
 
@@ -173,6 +171,11 @@ li.copied {
 .entity-inline-wrapper {
   color: hsl(200, 0%, 70%);
 }
+
+ul.entity-relations {
+  list-style: none;
+}
+
 .entity-label {
   font-style: italic;
   color: black;

@@ -1,22 +1,21 @@
 {% load bleach_tags %}
 {% load extra_filters %}
 
+{% if re_dict_2tuples %}
 
-{% for rl_edg in relation_edges %}
-<div class="entity-relation-edge">
+    <ul class="entity-relations">
+        {% for tup in re_dict_2tuples %}
+            <li class="entity-relation-edge">
+                … &nbsp;
+                {% for entity_dict in tup %}
+                    {% include entity_dict.template with c=entity_dict %}
+                {% endfor %}
+            </li>
+        {% endfor %}
+    </ul>
 
-    · {{rl_edg|get_obj_attr_chain:"relation:short_key"}}("{{rl_edg|get_obj_attr_chain:"relation:R1"}}") →
-    {% if rl_edg|get_obj_attr:"corresponding_entity" %}
-        <a href="{% url 'entitypage' rl_edg|get_obj_attr_chain:'corresponding_entity:short_key' %}">
-            {{rl_edg|get_obj_attr_chain:"corresponding_entity:short_key"}}
-        </a>("{{rl_edg|get_obj_attr_chain:"corresponding_entity:R1"}}")
-    {% else %}
-        <span class="literal">{{rl_edg.corresponding_literal}}</span>
-    {% endif %}
-</div>
-{% endfor %}
-
-{% if not relation_edges %}
+{% else %}
 
 no relations found
 {% endif %}
+
