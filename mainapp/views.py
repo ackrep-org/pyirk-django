@@ -157,13 +157,13 @@ def render_entity_relations(db_entity: Entity) -> str:
 def render_entity_scopes(db_entity: Entity) -> str:
     code_entity = pyerk.ds.get_entity(db_entity.key_str)
     # noinspection PyProtectedMember
-    for ns_name, ns in code_entity._namespaces.items():
-        pass
 
     scopes = pyerk.get_scopes(code_entity)
 
     scope_contents = []
     for scope in scopes:
+
+        # #### first: handle "variables" (locally relevant items) defined in this scope
 
         items = pyerk.get_items_defined_in_scope(scope)
         re: pyerk.RelationEdge
@@ -174,9 +174,18 @@ def render_entity_scopes(db_entity: Entity) -> str:
             for re in pyerk.ds.relation_edges[item.short_key]["R4"]:
                 defining_relation_triples.append(list(map(represent_entity_as_dict, re.relation_tuple)))
 
+        # #### second: handle further relation triples in this scope
+
+        statement_relations = []
+        re: pyerk.RelationEdge
+        for re in pyerk.ds.scope_relation_edges[scope.short_key]:
+            dict_tup = tuple(represent_entity_as_dict(elt) for elt in re.relation_tuple)
+            statement_relations.append(dict_tup)
+
         scope_contents.append({
             "name": scope.R1,
             "defining_relations": defining_relation_triples,
+            "statement_relations": statement_relations,
         })
 
     ctx = {
