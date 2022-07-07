@@ -1,5 +1,7 @@
 {% load bleach_tags %}
 
+{# TODO: obsolete! #}
+
 {# |json_script does not work here beause the id is also data-dependent#}
 {# also we have to use < script > or < myscript > depending on target. → variable script_tag #}
 {% if script_tag %}
@@ -7,7 +9,8 @@
     <{{script_tag}} id="copy_text_{{idx}}" type="application/json">"{{key_str}}(\"{{label}}\")"</{{script_tag}}>
 {% endif %}
 
-<div class="entity-label">
-    <a href="{{url}}">{{key_str}}</a>("{{label|bleach}}")
-</div>
+<span class="entity-inline-wrapper">
+    <span class="entity-key {{special_class}}"><a href="{{url}}">{{key_str}}</a></span>("<!--
+    --><span class="entity-label">{{label|bleach}}</span>")
 <div class="entity-description">{{description|bleach}}</div>
+</span>

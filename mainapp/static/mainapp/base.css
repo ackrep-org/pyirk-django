@@ -189,6 +189,10 @@ ul.entity-relations {
   font-size: 70%;
 }
 
+.entity-key.highlight {
+  color: hsl(200, 40%, 40%);
+}
+
 .hidden {
     display: none;
 }

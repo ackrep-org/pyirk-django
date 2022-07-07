@@ -34,7 +34,7 @@ def get_item(request):
         for idx, db_entity in enumerate(entities):
             db_entity: Entity
 
-            payload.append(render_entity_list_entry(db_entity, idx, script_tag="script"))
+            payload.append(render_entity_inline(db_entity, idx=idx, script_tag="script", include_description=True))
 
     return JsonResponse({"status": 200, "data": payload})
 
@@ -59,10 +59,10 @@ def render_entity_list_entry(db_entity: Entity, idx, script_tag="myscript") -> s
 
 def mockup(request):
     db_entity = get_object_or_404(Entity, key_str="I5")
-    rendered_entity = render_entity_list_entry(db_entity, idx=23, script_tag="script")
+    rendered_entity = render_entity_inline(db_entity, idx=23, script_tag="myscript", include_description=True)
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
 
-    return render(request, 'mainapp/page-searchresult-test.html', context)
+    return render(request, 'mainapp/page-searchresult-test-page.html', context)
 
 
 def entity_view(request, key_str=None):
@@ -70,7 +70,7 @@ def entity_view(request, key_str=None):
     util.reload_data(omit_reload=True)
 
     db_entity = get_object_or_404(Entity, key_str=key_str)
-    rendered_entity = render_entity_inline(db_entity)
+    rendered_entity = render_entity_inline(db_entity, special_class="highlight", include_description=True)
     rendered_entity_relations = render_entity_relations(db_entity)
     # rendered_entity_context_vars = render_entity_context_vars(db_entity)
     rendered_entity_scopes = render_entity_scopes(db_entity)
@@ -85,13 +85,20 @@ def entity_view(request, key_str=None):
     return render(request, 'mainapp/page-entity-detail.html', context)
 
 
-def render_entity_inline(db_entity: Entity) -> str:
+def render_entity_inline(db_entity: Entity, **kwargs) -> str:
 
     entity_dict = represent_entity_as_dict(pyerk.ds.get_entity(db_entity.key_str))
     template = get_template(entity_dict["template"])
 
+    entity_dict.update(kwargs)
+
     ctx = {
-        "c": entity_dict
+        "c": entity_dict,
+        #  copy some items to global context (where the template expects them)
+        # background: these options are in global context because the template is also used like
+        # {% include main_entity.template with c=main_entity omit_label=True %}
+        # where `with c.omit_label=True` is invalid template syntax
+        **{k: v for k, v in kwargs.items() if k in ("omit_label", "include_description")}
     }
     rendered_entity = template.render(context=ctx)
     return rendered_entity
@@ -205,7 +212,7 @@ def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
         res = {
             "short_key": code_entity.short_key,
             "label": code_entity.R1,
-            "description": code_entity.R2,
+            "description": str(code_entity.R2),
             "detail_url": reverse("entitypage", kwargs={"key_str": code_entity.short_key}),
             "template": "mainapp/widget-entity-inline.html",
         }
