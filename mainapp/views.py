@@ -39,24 +39,6 @@ def get_item(request):
     return JsonResponse({"status": 200, "data": payload})
 
 
-def render_entity_list_entry(db_entity: Entity, idx, script_tag="myscript") -> str:
-
-    if isinstance(db_entity, str):
-        db_entity = get_object_or_404(Entity, key_str=db_entity)
-
-    template = get_template("mainapp/widget-entity-list-entry.html")
-    ctx = {
-        "key_str": db_entity.key_str,
-        "label": db_entity.label,
-        "description": db_entity.description,
-        "url": reverse("entitypage", kwargs={"key_str": db_entity.key_str}),
-        "idx": idx,
-        "script_tag": script_tag,
-    }
-    rendered_entity = template.render(context=ctx)
-    return rendered_entity
-
-
 def mockup(request):
     db_entity = get_object_or_404(Entity, key_str="I5")
     rendered_entity = render_entity_inline(db_entity, idx=23, script_tag="myscript", include_description=True)
@@ -224,28 +206,6 @@ def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
         }
 
     return res
-
-
-# TODO: obsolete?
-"""
-def render_entity_context_vars(db_entity: Entity) -> str:
-    template = get_template("mainapp/widget-entity-context-vars.html")
-    code_entity = pyerk.ds.get_entity(db_entity.key_str)
-    context_vars0 = getattr(code_entity, "_context_vars", dict()).items()
-
-    context_vars = []
-    for i, (name, var) in enumerate(context_vars0):
-        if isinstance(var, pyerk.GenericInstance):
-            context_vars.append((name, "GenericInstance of", render_entity(var.cls.short_key, i, script_tag=None)))
-        else:
-            context_vars.append((name, "is", render_entity(var.cls.short_key, i)))
-
-    ctx = {
-        "context_vars": context_vars
-    }
-    render_result = template.render(context=ctx)
-    return render_result
-"""
 
 
 def debug_view(request, xyz=0):
