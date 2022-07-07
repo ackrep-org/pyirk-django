@@ -175,6 +175,9 @@ li.copied {
 ul.entity-relations {
   list-style: none;
 }
+.entity-relations li {
+  margin-top: 0.3rem;
+}
 
 .entity-label {
   font-style: italic;

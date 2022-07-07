@@ -101,26 +101,56 @@ def render_entity_relations(db_entity: Entity) -> str:
 
     # omit information which is already displayed by render_entity (label, description)
     black_listed_keys = ["R1", "R2"]
+    short_key = db_entity.key_str
+
+    # #########################################################################
+    # frist: handle direct relations (where `db_entity` is subject)
+    # #########################################################################
 
     # dict like {"R1": [<RelationEdge 1234>, ...], "R2": [...]}
-    relation_edges0 = pyerk.ds.relation_edges[db_entity.key_str]
+    relation_edges0 = pyerk.ds.relation_edges[short_key]
 
-    # create a flat list
+    # create a flat list of template-friendly dicts
     re_dict_2tuples = []
-    for key, re_list in relation_edges0.items():
-        if key in black_listed_keys:
+    for rel_key, re_list in relation_edges0.items():
+        if rel_key in black_listed_keys:
             continue
         for re in re_list:
-            # index 0 is the subject entity which is not relevant here
+            # index 0 is the subject entity which is db_entity and thus not relevant here
             d1 = represent_entity_as_dict(re.relation_tuple[1])
             d2 = represent_entity_as_dict(re.relation_tuple[2])
             re_dict_2tuples.append((d1, d2))
 
+    # #########################################################################
+    # second: handle inverse relations (where `db_entity` is object)
+    # #########################################################################
+
+    # dict like {"R4": [<RelationEdge 1234>, ...], "R8": [...]}
+    inv_relation_edges0 = pyerk.ds.inv_relation_edges[short_key]
+
+    # create a flat list of template-friendly dicts
+    inv_re_dict_2tuples = []
+    for rel_key, inv_re_list in inv_relation_edges0.items():
+        if rel_key in black_listed_keys:
+            continue
+        for re in inv_re_list:
+            # index 2 is the object entity of the inverse relations which is db_entity and thus not relevant here
+            d0 = represent_entity_as_dict(re.relation_tuple[0])
+            d1 = represent_entity_as_dict(re.relation_tuple[1])
+            inv_re_dict_2tuples.append((d0, d1))
+
+    # #########################################################################
+    # third: render the two lists and return
+    # #########################################################################
+
     ctx = {
+        "main_entity": represent_entity_as_dict(pyerk.ds.get_entity(short_key)),
         "re_dict_2tuples": re_dict_2tuples,
+        "inv_re_dict_2tuples": inv_re_dict_2tuples,
     }
     template = get_template("mainapp/widget-entity-relations.html")
     render_result = template.render(context=ctx)
+
     return render_result
 
 

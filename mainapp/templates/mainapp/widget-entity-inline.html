@@ -1,6 +1,10 @@
 {% load bleach_tags %}
 
-
 <span class="entity-inline-wrapper">
-<span class="entity-key"><a href="{{c.detail_url}}">{{c.short_key}}</a></span>("<span class="entity-label" title="{{c.description}}">{{c.label|bleach}}</span>")
+<span class="entity-key"><a href="{{c.detail_url}}">{{c.short_key}}</a></span><!--
+{# Note: the default value is taken if the variable evaluates to False.
+Thus this is implemented with non-intuitive double negation ("not omit") #}
+-->{% if not omit_label|default:False %}<!--
+    -->("<span class="entity-label" title="{{c.description}}">{{c.label|bleach}}</span>")
+{% endif %}
 </span>
