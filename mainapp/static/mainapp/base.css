@@ -170,7 +170,11 @@ li.copied {
   text-decoration: italic;
 }
 
+.entity-inline-wrapper {
+  color: hsl(200, 0%, 70%);
+}
 .entity-label {
+  font-style: italic;
   color: black;
 }
 

@@ -4,6 +4,8 @@ import markdown
 import mdx_math
 from bs4 import BeautifulSoup
 
+from ipydex import IPS, activate_ips_on_exception
+
 register = template.Library()
 
 # see https://python-markdown.github.io/reference/#extensions
@@ -58,6 +60,7 @@ def allow_json_script(src):
     return str(bs)
 
 
+# TODO: Obsolete?
 @register.filter
 def dicttype(arg: dict) -> str:
     """
@@ -76,3 +79,16 @@ def dicttype(arg: dict) -> str:
         return "dict"
 
 
+@register.filter
+def foo(arg: object) -> str:
+    return "foo"
+
+
+@register.filter
+def debug(arg: object) -> object:
+    """
+    start shell for debugging to examine variable content in template
+    """
+
+    IPS()
+    return arg

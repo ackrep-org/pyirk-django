@@ -65,7 +65,6 @@ def mockup(request):
 
 
 def entity_view(request, key_str=None):
-
     # TODO: in the future this should not be triggered on every page refresh
     util.reload_data(omit_reload=True)
 
@@ -73,14 +72,14 @@ def entity_view(request, key_str=None):
     rendered_entity = render_entity(db_entity, idx=0, script_tag="myscript")
     rendered_entity_relations = render_entity_relations(db_entity)
     # rendered_entity_context_vars = render_entity_context_vars(db_entity)
-    rendered_entity_namespaces = render_entity_scopes(db_entity)
+    rendered_entity_scopes = render_entity_scopes(db_entity)
 
     context = dict(
         rendered_entity=rendered_entity,
         entity=db_entity,
         rendered_entity_relations=rendered_entity_relations,
         # rendered_entity_context_vars=rendered_entity_context_vars,
-        rendered_entity_namespaces=rendered_entity_namespaces,
+        rendered_entity_scopes=rendered_entity_scopes,
     )
     return render(request, 'mainapp/page-entity-detail.html', context)
 
@@ -105,18 +104,54 @@ def render_entity_relations(db_entity: Entity) -> str:
 
 
 def render_entity_scopes(db_entity: Entity) -> str:
-    template = get_template("mainapp/widget-entity-scopes.html")
     code_entity = pyerk.ds.get_entity(db_entity.key_str)
     # noinspection PyProtectedMember
     for ns_name, ns in code_entity._namespaces.items():
         pass
-    # noinspection PyProtectedMember
+
+    scopes = pyerk.get_scopes(code_entity)
+
+    scope_contents = []
+    for scope in scopes:
+
+        items = pyerk.get_items_defined_in_scope(scope)
+        re: pyerk.RelationEdge
+        # currently we only use `R4__instance_of` as "defining relation"
+        # relation_edges = [re for key, re_list in relation_edges0.items() if key not in black_listed_keys for re in re_list]
+        defining_relation_triples = []
+        for item in items:
+            for re in pyerk.ds.relation_edges[item.short_key]["R4"]:
+                defining_relation_triples.append(list(map(represent_entity_as_dict, re.relation_tuple)))
+
+        scope_contents.append({
+            "name": scope.R1,
+            "defining_relations": defining_relation_triples,
+        })
+
+    c = scopes[0]
+    q = pyerk.ds.inv_relation_edges[c.short_key]["R20"][0]
+
     ctx = {
-        "namespaces": code_entity._namespaces
+        "scopes": scope_contents
     }
 
+    template = get_template("mainapp/widget-entity-scopes.html")
     render_result = template.render(context=ctx)
+    # IPS()
     return render_result
+
+
+# noinspection PyUnresolvedReferences
+def represent_entity_as_dict(entity: Entity) -> dict:
+    res = {
+        "short_key": entity.short_key,
+        "label": entity.R1,
+        "description": entity.R2,
+        "detail_url": reverse("entitypage", kwargs={"key_str": entity.short_key}),
+        "template": "mainapp/widget-entity-inline.html",
+    }
+
+    return res
 
 
 # TODO: obsolete?
