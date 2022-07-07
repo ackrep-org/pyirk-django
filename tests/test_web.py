@@ -45,7 +45,8 @@ class TestMainApp1(TestCase):
 
         # url = reverse("entitypage", kwargs=dict(key_str="I15"))
         # res = self.client.get(url)
-        url = reverse("entitypage", kwargs=dict(key_str="I3007"))
+        # url = reverse("entitypage", kwargs=dict(key_str="I3007"))
+        url = "/search/?q=bound"
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
 

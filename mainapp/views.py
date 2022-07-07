@@ -29,12 +29,16 @@ def get_item(request):
 
     payload = []
     if q:
-        entities = Entity.objects.filter(Q(label__icontains=q) | Q(key_str__icontains=q))
+        entities = Entity.objects.filter(Q(label__icontains=q) | Q(key_str__icontains=q) | Q(description__icontains=q))
 
         for idx, db_entity in enumerate(entities):
             db_entity: Entity
 
-            payload.append(render_entity_inline(db_entity, idx=idx, script_tag="script", include_description=True))
+            payload.append(
+                render_entity_inline(
+                    db_entity, idx=idx, script_tag="script", include_description=True, highlight_text=q
+                )
+            )
 
     return JsonResponse({"status": 200, "data": payload})
 
@@ -71,6 +75,13 @@ def render_entity_inline(db_entity: Entity, **kwargs) -> str:
 
     entity_dict = represent_entity_as_dict(pyerk.ds.get_entity(db_entity.key_str))
     template = get_template(entity_dict["template"])
+
+    highlight_text = kwargs.pop("highlight_text", None)
+
+    if highlight_text:
+        for key in entity_dict.keys():
+            value = entity_dict[key]
+            entity_dict[key] = value.replace(highlight_text, f"<strong>{highlight_text}</strong>")
 
     entity_dict.update(kwargs)
 
