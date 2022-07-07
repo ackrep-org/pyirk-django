@@ -18,7 +18,7 @@ def home_page_view(request):
 
     context = dict(greeting_message="Hello, World!")
 
-    return render(request, 'mainapp/landing-page.html', context)
+    return render(request, 'mainapp/page-landing.html', context)
 
 
 # /search/?q=...
@@ -43,7 +43,7 @@ def render_entity(db_entity: Entity, idx, script_tag="myscript") -> str:
     if isinstance(db_entity, str):
         db_entity = get_object_or_404(Entity, key_str=db_entity)
 
-    template = get_template("mainapp/entity-list-entry.html")
+    template = get_template("mainapp/widget-entity-list-entry.html")
     ctx = {
         "key_str": db_entity.key_str,
         "label": db_entity.label,
@@ -61,7 +61,7 @@ def mockup(request):
     rendered_entity = render_entity(db_entity, idx=23, script_tag="script")
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
 
-    return render(request, 'mainapp/searchresult-test-page.html', context)
+    return render(request, 'mainapp/page-searchresult-test.html', context)
 
 
 def entity_view(request, key_str=None):
@@ -73,7 +73,7 @@ def entity_view(request, key_str=None):
     rendered_entity = render_entity(db_entity, idx=0, script_tag="myscript")
     rendered_entity_relations = render_entity_relations(db_entity)
     # rendered_entity_context_vars = render_entity_context_vars(db_entity)
-    rendered_entity_namespaces = render_entity_namespaces(db_entity)
+    rendered_entity_namespaces = render_entity_scopes(db_entity)
 
     context = dict(
         rendered_entity=rendered_entity,
@@ -82,11 +82,11 @@ def entity_view(request, key_str=None):
         # rendered_entity_context_vars=rendered_entity_context_vars,
         rendered_entity_namespaces=rendered_entity_namespaces,
     )
-    return render(request, 'mainapp/entity-detail-page.html', context)
+    return render(request, 'mainapp/page-entity-detail.html', context)
 
 
 def render_entity_relations(db_entity: Entity) -> str:
-    template = get_template("mainapp/entity-relations.html")
+    template = get_template("mainapp/widget-entity-relations.html")
 
     # omit information which is already displayed by render_entity (label, description)
     black_listed_keys = ["R1", "R2"]
@@ -104,8 +104,8 @@ def render_entity_relations(db_entity: Entity) -> str:
     return render_result
 
 
-def render_entity_namespaces(db_entity: Entity) -> str:
-    template = get_template("mainapp/entity-namespaces.html")
+def render_entity_scopes(db_entity: Entity) -> str:
+    template = get_template("mainapp/widget-entity-scopes.html")
     code_entity = pyerk.ds.get_entity(db_entity.key_str)
     # noinspection PyProtectedMember
     for ns_name, ns in code_entity._namespaces.items():
@@ -122,7 +122,7 @@ def render_entity_namespaces(db_entity: Entity) -> str:
 # TODO: obsolete?
 """
 def render_entity_context_vars(db_entity: Entity) -> str:
-    template = get_template("mainapp/entity-context-vars.html")
+    template = get_template("mainapp/widget-entity-context-vars.html")
     code_entity = pyerk.ds.get_entity(db_entity.key_str)
     context_vars0 = getattr(code_entity, "_context_vars", dict()).items()
 
