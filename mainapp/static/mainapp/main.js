@@ -118,18 +118,18 @@ main_input.addEventListener('keydown', function(event) {
     //
     // Shift + Enter
     //
-    var url = JSON.parse(document.getElementById(`result_url_${index}`).textContent);
-
-    console.log(`Shift Enter-->url: ${url}`);
-    window.location.assign(url);
-  } else if (event.which === 13 && liSelected ) {
-    //
-    // Enter
-    //
     var copy_text = JSON.parse(document.getElementById(`copy_text_${index}`).textContent);
     console.log(`Enter--> copy ${copy_text}`);
     copytoclipboard(copy_text);
     liSelected.classList.add("copied");
+  } else if (event.which === 13 && liSelected ) {
+    //
+    // Enter
+    //
+    var url = JSON.parse(document.getElementById(`result_url_${index}`).textContent);
+
+    console.log(`Shift Enter-->url: ${url}`);
+    window.location.assign(url);
   } else if (event.which === 27) {
     // ESC
     console.log("ESC");
