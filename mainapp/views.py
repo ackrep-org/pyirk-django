@@ -19,7 +19,7 @@ def home_page_view(request):
 
     context = dict(greeting_message="Hello, World!")
 
-    return render(request, 'mainapp/page-landing.html', context)
+    return render(request, "mainapp/page-landing.html", context)
 
 
 # /search/?q=...
@@ -44,7 +44,7 @@ def mockup(request):
     rendered_entity = render_entity_inline(db_entity, idx=23, script_tag="myscript", include_description=True)
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
 
-    return render(request, 'mainapp/page-searchresult-test-page.html', context)
+    return render(request, "mainapp/page-searchresult-test-page.html", context)
 
 
 def entity_view(request, key_str=None):
@@ -64,7 +64,7 @@ def entity_view(request, key_str=None):
         # rendered_entity_context_vars=rendered_entity_context_vars,
         rendered_entity_scopes=rendered_entity_scopes,
     )
-    return render(request, 'mainapp/page-entity-detail.html', context)
+    return render(request, "mainapp/page-entity-detail.html", context)
 
 
 def render_entity_inline(db_entity: Entity, **kwargs) -> str:
@@ -80,7 +80,7 @@ def render_entity_inline(db_entity: Entity, **kwargs) -> str:
         # background: these options are in global context because the template is also used like
         # {% include main_entity.template with c=main_entity omit_label=True %}
         # where `with c.omit_label=True` is invalid template syntax
-        **{k: v for k, v in kwargs.items() if k in ("omit_label", "include_description")}
+        **{k: v for k, v in kwargs.items() if k in ("omit_label", "include_description")},
     }
     rendered_entity = template.render(context=ctx)
     return rendered_entity
@@ -171,15 +171,15 @@ def render_entity_scopes(db_entity: Entity) -> str:
             dict_tup = tuple(represent_entity_as_dict(elt) for elt in re.relation_tuple)
             statement_relations.append(dict_tup)
 
-        scope_contents.append({
-            "name": scope.R1,
-            "defining_relations": defining_relation_triples,
-            "statement_relations": statement_relations,
-        })
+        scope_contents.append(
+            {
+                "name": scope.R1,
+                "defining_relations": defining_relation_triples,
+                "statement_relations": statement_relations,
+            }
+        )
 
-    ctx = {
-        "scopes": scope_contents
-    }
+    ctx = {"scopes": scope_contents}
 
     template = get_template("mainapp/widget-entity-scopes.html")
     render_result = template.render(context=ctx)
@@ -219,4 +219,4 @@ def debug_view(request, xyz=0):
     elif xyz == 2:
         return HttpResponseServerError("Errormessage")
 
-    return HttpResponse(f'Some plain message {xyz}')
+    return HttpResponse(f"Some plain message {xyz}")

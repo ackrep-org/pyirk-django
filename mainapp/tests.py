@@ -37,4 +37,3 @@ class TestMainApp1(TestCase):
         # this will deliberately provoke an server error (http status code 500)
         res = self.client.get(reverse("debugpage_with_argument", kwargs={"xyz": 2}))
         self.assertEquals(res.status_code, 500)
-
