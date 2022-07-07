@@ -3,10 +3,22 @@
 {% load bleach_tags %}
 
 {% block title %}Search Page Test Mockup{% endblock %}
-{% block content %}
 
+{% block head_supplement %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full"></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  config: ["MMLorHTML.js"],
+  jax: ["input/TeX", "output/HTML-CSS", "output/NativeMML"],
+  extensions: ["MathMenu.js", "MathZoom.js"]
+});
+</script>
+{% endblock %}
+
+{% block content %}
     <div  class="ac_input_wrapper">
-        abcd
+        This is math: <script type="tex/math"> a = b + c </script>
+        <script type="math/tex; mode=display"> \int_0^{2\pi} \sin x dx = 0 </script>
     </div>
 
     {{ "https://startpage.com"|json_script:"target_url" }}
@@ -128,8 +140,6 @@
     Das ist weiterer Text der geht gleich weiter.
     </p>
 {% endblock %}
-
-
 
 {% block script %}
 <script type="text/javascript" src="{% static 'mainapp/main.js' %}"></script>
