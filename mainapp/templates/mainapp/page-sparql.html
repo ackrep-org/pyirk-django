@@ -1,4 +1,5 @@
 {% extends "mainapp/base.html" %}
+{% load bleach_tags %}
 
 {% block content %}
 
@@ -6,7 +7,7 @@
 
 {% if err %}
 <div class="errorbox">
-    <pre>{{ err }}</pre>
+    {{ err }}
 </div>
 {% endif %}
 
@@ -26,6 +27,7 @@
 
 <h3>Results</h3>
 
-{{c.results}}
+{{c.tab|bleach}}
+
 
 {% endblock  %}

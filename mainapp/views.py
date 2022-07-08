@@ -7,6 +7,7 @@ from django.views import View
 from django.urls import reverse
 from django.db.models import Q
 from textwrap import dedent as twdd
+from tabulate import tabulate
 import pyerk
 import pyerk.rdfstack
 from . import util
@@ -76,9 +77,16 @@ def entity_view(request, key_str=None):
     return render(request, "mainapp/page-entity-detail.html", context)
 
 
-def render_entity_inline(db_entity: Entity, **kwargs) -> str:
+def render_entity_inline(entity: Union[Entity, pyerk.Entity], **kwargs) -> str:
 
-    entity_dict = represent_entity_as_dict(pyerk.ds.get_entity(db_entity.key_str))
+    # allow both models.Entity (from db) and "code-defined" pyerk.Entity
+    if isinstance(entity, pyerk.Entity):
+        code_entity = entity
+    else:
+        assert isinstance(entity, Entity)
+        code_entity = pyerk.ds.get_entity(entity.key_str)
+
+    entity_dict = represent_entity_as_dict(code_entity)
     template = get_template(entity_dict["template"])
 
     highlight_text = kwargs.pop("highlight_text", None)
@@ -234,10 +242,13 @@ class SearchSparqlView(View):
         qsrc = context["query"] = request.GET.get("query", example_query)
 
         try:
-            c.results = pyerk.rdfstack.perform_sparql_query(qsrc)
-        except Exception as e:
+            tmp_results = pyerk.rdfstack.perform_sparql_query(qsrc)
+            c.results = pyerk.aux.apply_func_to_table_cells(render_entity_inline, tmp_results)
+        except pyerk.rdfstack.ParseException as e:
             context["err"] = f"The following error occurred: {type(e).__name__}: {str(e)}"
             c.results = []
+
+        c.tab = tabulate(c.results, headers=(), tablefmt="unsafehtml")
 
         context["c"] = c  # this could be used for further options
 

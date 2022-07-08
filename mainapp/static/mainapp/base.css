@@ -147,6 +147,7 @@ body a:hover{
     background-color:hsl(0, 90%, 75%);
     padding: 5px;
     margin-bottom: 1em;
+    font-family: monospace;
 }
 
 .styled_form {
