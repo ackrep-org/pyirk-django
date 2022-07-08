@@ -1,0 +1,31 @@
+{% extends "mainapp/base.html" %}
+
+{% block content %}
+
+<h3>Search RDF Graph with SPARQL</h3>
+
+{% if err %}
+<div class="errorbox">
+    <pre>{{ err }}</pre>
+</div>
+{% endif %}
+
+<form action="{% url 'sparqlpage' %}" method="GET" class="styled_form">
+<!--    {% csrf_token %}-->
+<!--    <label for="query">SPARQL query:</label>-->
+    <textarea id="query" name="query">{{ query }}</textarea>
+    <br>
+    <button id="btn_mr_submit" type="submit">Search</button>
+</form>
+
+
+
+{# in the original ackrep-template (search-sparql.html) here came the examples #}
+
+<br>
+
+<h3>Results</h3>
+
+{{c.results}}
+
+{% endblock  %}

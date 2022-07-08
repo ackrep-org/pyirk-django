@@ -1,11 +1,16 @@
 from typing import Union
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
+from django.template.response import TemplateResponse
 from django.template.loader import get_template
+from django.views import View
 from django.urls import reverse
 from django.db.models import Q
+from textwrap import dedent as twdd
 import pyerk
+import pyerk.rdfstack
 from . import util
+from addict import Dict as attr_dict
 
 from ipydex import IPS
 
@@ -217,6 +222,26 @@ def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
         }
 
     return res
+
+
+# this was taken from ackrep
+class SearchSparqlView(View):
+    def get(self, request):
+        context = {}
+        c = attr_dict()
+
+        example_query = twdd(pyerk.rdfstack.get_sparql_example_query())
+        qsrc = context["query"] = request.GET.get("query", example_query)
+
+        try:
+            c.results = pyerk.rdfstack.perform_sparql_query(qsrc)
+        except Exception as e:
+            context["err"] = f"The following error occurred: {type(e).__name__}: {str(e)}"
+            c.results = []
+
+        context["c"] = c  # this could be used for further options
+
+        return TemplateResponse(request, "mainapp/page-sparql.html", context)
 
 
 def debug_view(request, xyz=0):
