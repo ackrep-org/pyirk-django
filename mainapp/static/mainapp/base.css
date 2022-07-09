@@ -213,7 +213,7 @@ li.copied {
   text-decoration: italic;
 }
 
-.entity-inline-wrapper {
+.entity-inline-wrapper, .literal-inline-wrapper {
   color: hsl(200, 0%, 70%);
 }
 
