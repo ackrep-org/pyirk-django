@@ -82,9 +82,12 @@ def render_entity_inline(entity: Union[Entity, pyerk.Entity], **kwargs) -> str:
     # allow both models.Entity (from db) and "code-defined" pyerk.Entity
     if isinstance(entity, pyerk.Entity):
         code_entity = entity
-    else:
-        assert isinstance(entity, Entity)
+    elif isinstance(entity, Entity):
         code_entity = pyerk.ds.get_entity(entity.key_str)
+    else:
+        # TODO: improve handling of literal values
+        assert isinstance(entity, (str, int, float, complex))
+        code_entity = entity
 
     entity_dict = represent_entity_as_dict(code_entity)
     template = get_template(entity_dict["template"])
