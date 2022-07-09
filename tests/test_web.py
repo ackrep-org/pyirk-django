@@ -54,4 +54,8 @@ class TestMainApp1(TestCase):
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
 
+        url = "/sparql/?query=%0D%0APREFIX+%3A+%3Cerk%3A%2F%3E%0D%0ASELECT+*%0D%0AWHERE+%7B%0D%0A++++%3Fs+%3AR5+%3Fo.%0D%0A%7D%0D%0A"
+        res = self.client.get(url)
+        self.assertEquals(res.status_code, 200)
+
 

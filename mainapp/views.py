@@ -238,6 +238,7 @@ def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
 # this was taken from ackrep
 class SearchSparqlView(View):
     def get(self, request):
+        util.reload_data(omit_reload=True)
         context = {}
         c = attr_dict()
 
@@ -246,12 +247,14 @@ class SearchSparqlView(View):
 
         try:
             tmp_results = pyerk.rdfstack.perform_sparql_query(qsrc)
+            sparql_vars = [str(v) for v in tmp_results.vars]
             c.results = pyerk.aux.apply_func_to_table_cells(render_entity_inline, tmp_results)
         except pyerk.rdfstack.ParseException as e:
             context["err"] = f"The following error occurred: {type(e).__name__}: {str(e)}"
             c.results = []
+            sparql_vars = []
 
-        c.tab = tabulate(c.results, headers=(), tablefmt="unsafehtml")
+        c.tab = tabulate(c.results, headers=sparql_vars, tablefmt="unsafehtml")
 
         context["c"] = c  # this could be used for further options
 
