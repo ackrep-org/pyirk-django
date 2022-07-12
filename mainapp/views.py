@@ -95,9 +95,13 @@ def render_entity_inline(entity: Union[Entity, pyerk.Entity], **kwargs) -> str:
     highlight_text = kwargs.pop("highlight_text", None)
 
     if highlight_text:
+        new_data = {}
         for key in entity_dict.keys():
             value = entity_dict[key]
-            entity_dict[key] = value.replace(highlight_text, f"<strong>{highlight_text}</strong>")
+            new_key = f"hl_{key}"
+            new_data[new_key] = value.replace(highlight_text, f"<strong>{highlight_text}</strong>")
+
+        entity_dict.update(new_data)
 
     entity_dict.update(kwargs)
 

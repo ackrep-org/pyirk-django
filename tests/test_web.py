@@ -26,7 +26,21 @@ class TestMainApp1(TestCase):
         # this is a simple mechanism to ensure the desired content actually was delivered
         self.assertEquals(res.status_code, 200)
         self.assertContains(res, "utc_landing_page")
-        self.assertNotContains(res, "utc_debug_page")
+
+    def test_search_api(self):
+        url = "/search/?q=set"
+        res = self.client.get(url)
+
+        soup = BeautifulSoup(res.content.decode("utf8"), "lxml")
+
+        script_tags = soup.findAll("script")
+
+        for tag in script_tags:
+            # this assumes that Item I13 has not changed its label since the test was written
+            if tag.contents and (tag.contents[0] == '\\"I13(\\\\\\"mathematical set\\\\\\")\\"'):
+                break
+        else:
+            self.assertTrue(False, "could not find expected copy-string in response")
 
     def test_entity_detail_view(self):
 
