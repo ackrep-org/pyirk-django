@@ -4,6 +4,10 @@
 :root {
 
     --color-gray-dark-text: #333;
+    --color-header-background: #EEE;
+    --color-footer-background: hsl(230, 20%, 15%);
+    --color-footer-text: hsl(00, 10%, 70%);
+    --width-content: min(75vw, 60em);
 
 
 }
@@ -41,12 +45,16 @@ body a:hover{
     padding-left: 15px;
     padding-top: 15px;
     padding-bottom: 15px;
-    margin-top: -10px;
+    margin-top: 10px;
     margin-right: auto;
     margin-left: auto;
-    width: 90vw;
-    max-width: 55em;
+    /*width: 90vw;
+    max-width: 55em;*/
+    width: var(--width-content);
+    max-width: var(--width-content);
     background-color: #FAFAFA;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 3px 1px -2px rgba(0,0,0,0.12),0 1px 5px 0 rgba(0,0,0,0.2);
+    border-radius: 2px;
 }
 
 
@@ -189,6 +197,9 @@ body a:hover{
 
 body {
   background-color: linen;
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
 }
 
 .autoComplete_wrapper {
@@ -269,6 +280,48 @@ ul.entity-relations {
   text-align: center;
   background-color: #f2f2f2;
   font-weight: bold;
+}
+
+.headerbar {
+  color: var(--color-gray-dark-text);
+  width: 100%;
+  border: 1px solid #EEE;
+  position: sticky;
+  top: 0;
+  margin-top: 0px;
+  background-color: var(--color-header-background);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.headerbar-content {
+  width: var(--width-content);
+  max-width: var(--width-content);
+  margin-right: auto;
+  margin-left: auto;
+}
+.headerbar-content h1 {
+    font-size: 130%;
+}
+
+.non-footer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.footer {
+  padding-top: 1em;
+  padding-bottom: 1em;
+  color: var(--color-footer-text);
+  background-color: var(--color-footer-background);
+  width: 100%;
+}
+.footer-content {
+  margin-right: auto;
+  margin-left: auto;
+  width: var(--width-content);
+  max-width: var(--width-content);
+  padding: var(--padding-header);
 }
 
 

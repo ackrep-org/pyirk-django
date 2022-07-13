@@ -23,14 +23,27 @@
 
 <body>
 
-<div class="main">
-{% block page-header %}
+<div class="non-footer">
+    <div class="headerbar">
+    <div class="headerbar-content">
+
+ {% block page-header %}
     <a href="{% url 'landingpage' %}"><h1>ERK: Easy Representation of Knowledge</h1></a>
 {% endblock %}
+    </div>
+    </div>
+<div class="main">
 
 {% block content %}
 {% endblock %}
 
+</div>
+</div>
+
+<div class="footer">
+    <div class="footer-content">
+        This is the footer
+    </div>
 </div>
 
 
