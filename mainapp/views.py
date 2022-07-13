@@ -159,7 +159,7 @@ def render_entity_relations(db_entity: Entity) -> str:
     # #########################################################################
 
     ctx = {
-        "main_entity": represent_entity_as_dict(pyerk.ds.get_entity(short_key)),
+        "main_entity": {"special_class": "highlight", **represent_entity_as_dict(pyerk.ds.get_entity(short_key))},
         "re_dict_2tuples": re_dict_2tuples,
         "inv_re_dict_2tuples": inv_re_dict_2tuples,
     }
