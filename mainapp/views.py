@@ -20,9 +20,6 @@ from .models import Entity
 
 def home_page_view(request):
 
-    # TODO: in the future this should not be triggered on every page refresh
-    util.reload_data(omit_reload=True)
-
     context = dict(greeting_message="Hello, World!")
 
     return render(request, "mainapp/page-landing.html", context)
@@ -58,8 +55,6 @@ def mockup(request):
 
 
 def entity_view(request, key_str=None):
-    # TODO: in the future this should not be triggered on every page refresh
-    util.reload_data(omit_reload=True)
 
     db_entity = get_object_or_404(Entity, key_str=key_str)
     rendered_entity = render_entity_inline(db_entity, special_class="highlight", include_description=True)
@@ -239,10 +234,24 @@ def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
     return res
 
 
+def reload_data_redirect(request, targeturl=None):
+    """
+    This view reloads the data and then redirects to target url
+
+    :param request:
+    :param targeturl:
+    :return:
+    """
+    if targeturl is None:
+        targeturl = "/"
+    util.reload_data(omit_reload=False)
+
+    return HttpResponseRedirect(targeturl)
+
+
 # this was taken from ackrep
 class SearchSparqlView(View):
     def get(self, request):
-        util.reload_data(omit_reload=True)
         context = {}
         c = attr_dict()
 

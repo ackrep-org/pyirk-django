@@ -6,6 +6,7 @@ urlpatterns = [
     path("", views.home_page_view, name="landingpage"),
     path(r"mockup", views.mockup, name="mockuppage"),
     path(r"search/", views.get_item, name="search"),
+    path(r"reload/", views.reload_data_redirect, name="reload"),
     path("sparql/", views.SearchSparqlView.as_view(), name="sparqlpage"),
     path(r"e/<str:key_str>", views.entity_view, name="entitypage"),
     path(r"debug", views.debug_view, name="debugpage0"),

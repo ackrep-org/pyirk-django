@@ -72,4 +72,8 @@ class TestMainApp1(TestCase):
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
 
+    def test_reload_via_url(self):
+        url = reverse("reload")
+        res = self.client.get(url)
+        self.assertEquals(res.status_code, 302)
 
