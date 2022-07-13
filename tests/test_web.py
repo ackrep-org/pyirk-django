@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
+from textwrap import dedent as twdd
 from ipydex import IPS
+
 from bs4 import BeautifulSoup
 
 # noinspection PyUnresolvedReferences
@@ -44,21 +46,21 @@ class TestMainApp1(TestCase):
 
     def test_entity_detail_view(self):
 
-        txt = """
-        <myscript id="copy_text_0" type="application/json">"test"</myscript>
-        <myscript id="copy_text_1" type="application/xyz">"test"</myscript>
-        <myscript id="copy_text_2" type="application/json">"test"</myscript>
-        <p>some text</p>
-        """
-        bs = BeautifulSoup(txt, 'html.parser')
-        res = bs.find_all("myscript")
-        for tag in res:
-            if tag.attrs.get("type") == "application/json":
-                tag.name = "script"
-        txt2 = str(bs)
+        url = reverse("entitypage", kwargs=dict(key_str="I12"))
+        res = self.client.get(url)
+        content = res.content.decode("utf8")
+        self.assertIn('<span class="entity-key highlight"><a href="/e/I12">I12</a></span>', content)
 
-        # url = reverse("entitypage", kwargs=dict(key_str="I15"))
-        # res = self.client.get(url)
+        src1 = twdd("""
+        <span class="entity-key highlight"><a href="/e/I12">I12</a></span><!--
+        --><!--
+        --><!--
+        -->("<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>")<!--
+        -->
+        <div class="entity-description">base class for any knowledge object of interrest in the field of mathematics</div>
+        """)
+        self.assertIn(src1, content)
+
         url = "/search/?q=bound"
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
