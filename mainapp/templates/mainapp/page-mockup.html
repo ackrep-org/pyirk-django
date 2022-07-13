@@ -17,8 +17,12 @@ MathJax.Hub.Config({
 
 {% block content %}
     <div  class="ac_input_wrapper">
-        This is math: <script type="tex/math"> a = b + c </script>
+<!--        see: http://docs.mathjax.org/en/latest/web/start.html   -->
+        This is inline math: \(a = b + c - \int_0^{2\pi} \sin x dx\)
+        <br>
+        This is displaystyle math:
         <script type="math/tex; mode=display"> \int_0^{2\pi} \sin x dx = 0 </script>
+
     </div>
 
     {{ "https://startpage.com"|json_script:"target_url" }}

@@ -51,7 +51,7 @@ def mockup(request):
     rendered_entity = render_entity_inline(db_entity, idx=23, script_tag="myscript", include_description=True)
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
 
-    return render(request, "mainapp/page-searchresult-test-page.html", context)
+    return render(request, "mainapp/page-mockup.html", context)
 
 
 def entity_view(request, key_str=None):
