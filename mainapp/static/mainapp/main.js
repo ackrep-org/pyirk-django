@@ -33,7 +33,9 @@ async function input_callback(){
             var li = document.createElement("li");
             li.insertAdjacentHTML("beforeend", `${item}`);
             result_list.appendChild(li);
-        })
+        });
+        // this ensures that math is rendered if it is present.
+        MathJax.typeset();
     }
 }
 

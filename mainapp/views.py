@@ -91,7 +91,10 @@ def render_entity_inline(entity: Union[Entity, pyerk.Entity], **kwargs) -> str:
 
     if highlight_text:
         new_data = {}
+        replacement_exceptions = entity_dict.get("_replacement_exceptions", [])
         for key in entity_dict.keys():
+            if key.startswith("_") or key in replacement_exceptions:
+                continue
             value = entity_dict[key]
             new_key = f"hl_{key}"
             new_data[new_key] = value.replace(highlight_text, f"<strong>{highlight_text}</strong>")
@@ -217,12 +220,22 @@ def render_entity_scopes(db_entity: Entity) -> str:
 def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
 
     if isinstance(code_entity, pyerk.Entity):
+
+        # this is used where the replacement for highlighting is done
+        _replacement_exceptions = []
+        try:
+            generalized_label = code_entity.get_ui_short_representation()
+            _replacement_exceptions.append("label")
+        except AttributeError:
+            generalized_label = code_entity.R1
+
         res = {
             "short_key": code_entity.short_key,
-            "label": code_entity.R1,
+            "label": generalized_label,
             "description": str(code_entity.R2),
             "detail_url": reverse("entitypage", kwargs={"key_str": code_entity.short_key}),
             "template": "mainapp/widget-entity-inline.html",
+            "_replacement_exceptions": _replacement_exceptions
         }
     else:
         # assume we have a literal
