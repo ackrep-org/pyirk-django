@@ -7,6 +7,8 @@ from bs4 import BeautifulSoup
 
 # noinspection PyUnresolvedReferences
 import mainapp.util
+# noinspection PyUnresolvedReferences
+from mainapp import models
 
 # The tests can be run with
 # `python manage.py test`
@@ -79,3 +81,15 @@ class TestMainApp1(TestCase):
         res = self.client.get(url)
         self.assertEquals(res.status_code, 302)
 
+    def test_LanguageSpecifiedString(self):
+        t1 = models.LanguageSpecifiedString.objects.create(langtag="en", content="test1")
+        t2 = models.LanguageSpecifiedString.objects.create(langtag="de", content="test1")
+        res = models.LanguageSpecifiedString.objects.filter(langtag="de")
+        self.assertEquals(len(res), 1)
+
+        self.assertIn(t2, res)
+        w = models.Entity.objects.get(key_str="I20")
+        res = w.label.filter(langtag="en")
+        self.assertEquals(len(res), 1)
+
+        IPS()

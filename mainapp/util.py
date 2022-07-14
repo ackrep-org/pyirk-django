@@ -1,5 +1,5 @@
 import pyerk
-from .models import Entity
+from .models import Entity, LanguageSpecifiedString as LSS
 
 
 def reload_data(omit_reload=False) -> None:
@@ -19,16 +19,22 @@ def reload_data(omit_reload=False) -> None:
     # delete all existing data
     Entity.objects.all().delete()
 
+    # TODO: remove dublications
+
+    # recreate the databse content:items
     for itm in pyerk.ds.items.values():
-        Entity.objects.create(
+        label = LSS.objects.create(langtag="en", content=getattr(itm, "R1", None))
+        e = Entity.objects.create(
             key_str=itm.short_key,
-            label=getattr(itm, "R1", None),
             description=getattr(itm, "R2", None),
         )
+        e.label.add(label)
 
+    # same for relations
     for rel in pyerk.ds.relations.values():
-        Entity.objects.create(
+        label = LSS.objects.create(langtag="en", content=getattr(rel, "R1", None))
+        e = Entity.objects.create(
             key_str=rel.short_key,
-            label=getattr(rel, "R1", None),
             description=getattr(rel, "R2", None),
         )
+        e.label.add(label)
