@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 class BaseModel(models.Model):
@@ -24,7 +25,16 @@ class Entity(BaseModel):
     label = models.ManyToManyField(LanguageSpecifiedString)
     description = models.TextField(default="", null=True)
 
-    def __str__(self):
-        return self.label
+    def get_label(self, langtag=None) -> str:
+        if langtag is None:
+            langtag = settings.DEFAULT_DATA_LANGUAGE
+        res = self.label.filter(langtag=langtag)
+        if len(res) == 0:
+            return f"[no label in language {langtag} available]"
+        else:
+            return res[0].content
+
+    def __str__(self) -> str:
+        return self.get_label()
 
 

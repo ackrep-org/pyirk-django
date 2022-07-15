@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.db.models import Q
 from textwrap import dedent as twdd
 from ipydex import IPS
 
@@ -95,4 +96,8 @@ class TestMainApp1(TestCase):
         res = w.label.filter(langtag="en")
         self.assertEquals(len(res), 1)
 
-        IPS()
+        q = "sta"
+        res = models.Entity.objects.filter(
+            Q(label__content__icontains=q) | Q(key_str__icontains=q) | Q(description__icontains=q)
+        )
+        self.assertGreater(len(res), 5)

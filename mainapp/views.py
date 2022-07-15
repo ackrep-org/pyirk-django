@@ -32,7 +32,9 @@ def get_item(request):
 
     payload = []
     if q:
-        entities = Entity.objects.filter(Q(label__icontains=q) | Q(key_str__icontains=q) | Q(description__icontains=q))
+        entities = Entity.objects.filter(
+            Q(label__content__icontains=q) | Q(key_str__icontains=q) | Q(description__icontains=q)
+        )
 
         for idx, db_entity in enumerate(entities):
             db_entity: Entity

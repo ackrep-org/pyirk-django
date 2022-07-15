@@ -164,3 +164,5 @@ def allow_attributes(tag, name, value):
 BLEACH_ALLOWED_ATTRIBUTES = allow_attributes
 BLEACH_STRIP_TAGS = False
 BLEACH_STRIP_COMMENTS = False
+
+DEFAULT_DATA_LANGUAGE = "en"
