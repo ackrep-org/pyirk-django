@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 
 # noinspection PyUnresolvedReferences
 import mainapp.util
+
 # noinspection PyUnresolvedReferences
 from mainapp import models
 
@@ -53,14 +54,16 @@ class TestMainApp1(TestCase):
         content = res.content.decode("utf8")
         self.assertIn('<span class="entity-key highlight"><a href="/e/I12">I12</a></span>', content)
 
-        src1 = twdd("""
-        <span class="entity-key highlight"><a href="/e/I12">I12</a></span><!--
-        --><!--
-        --><!--
-        -->("<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>")<!--
-        -->
-        <div class="entity-description">base class for any knowledge object of interrest in the field of mathematics</div>
-        """)
+        src1 = twdd(
+            """
+            <span class="entity-key highlight"><a href="/e/I12">I12</a></span><!--
+            --><!--
+            --><!--
+            -->("<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>")<!--
+            -->
+            <div class="entity-description">base class for any knowledge object of interrest in the field of mathematics</div>
+            """
+        )
         self.assertIn(src1, content)
 
         url = "/search/?q=bound"
