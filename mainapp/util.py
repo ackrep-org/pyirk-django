@@ -24,9 +24,14 @@ def reload_data(omit_reload=False) -> None:
 
     # repopulate the databse with items and relations (and auxiliary objects)
     for ent in itertools.chain(pyerk.ds.items.values(), pyerk.ds.relations.values()):
-        label = LSS.objects.create(langtag="en", content=getattr(ent, "R1", None))
+        label = create_lss(ent, "R1")
         e = Entity.objects.create(
             key_str=ent.short_key,
             description=getattr(ent, "R2", None),
         )
         e.label.add(label)
+
+
+def create_lss(ent: pyerk.Entity, rel_key: str) -> LSS:
+    rdf_literal = pyerk.aux.ensure_rdf_str_literal(getattr(ent, rel_key, ""))
+    return LSS.objects.create(langtag=rdf_literal.language, content=rdf_literal.value)

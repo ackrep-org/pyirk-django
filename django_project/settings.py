@@ -165,4 +165,5 @@ BLEACH_ALLOWED_ATTRIBUTES = allow_attributes
 BLEACH_STRIP_TAGS = False
 BLEACH_STRIP_COMMENTS = False
 
-DEFAULT_DATA_LANGUAGE = "en"
+# noinspection PyUnresolvedReferences
+from pyerk.settings import DEFAULT_DATA_LANGUAGE

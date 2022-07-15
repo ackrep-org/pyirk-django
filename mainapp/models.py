@@ -22,12 +22,17 @@ class Entity(BaseModel):
 
     # TODO: this should be renamed to `short_key`
     key_str = models.TextField(default="(unknown key)")
+
+    # note: in reality this a one-to-many-relationship which in principle could be modeled by a ForeignKeyField
+    # on the other side. However, as we might use the LanguageSpecifiedString model also on other fields (e.g.
+    # description) in the future this is not an option
     label = models.ManyToManyField(LanguageSpecifiedString)
     description = models.TextField(default="", null=True)
 
     def get_label(self, langtag=None) -> str:
         if langtag is None:
             langtag = settings.DEFAULT_DATA_LANGUAGE
+        # noinspection PyUnresolvedReferences
         res = self.label.filter(langtag=langtag)
         if len(res) == 0:
             return f"[no label in language {langtag} available]"

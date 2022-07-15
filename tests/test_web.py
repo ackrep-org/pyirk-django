@@ -89,12 +89,16 @@ class TestMainApp1(TestCase):
         t1 = models.LanguageSpecifiedString.objects.create(langtag="en", content="test1")
         t2 = models.LanguageSpecifiedString.objects.create(langtag="de", content="test1")
         res = models.LanguageSpecifiedString.objects.filter(langtag="de")
-        self.assertEquals(len(res), 1)
+        self.assertGreaterEqual(len(res), 1)
 
         self.assertIn(t2, res)
-        w = models.Entity.objects.get(key_str="I20")
+        w = models.Entity.objects.get(key_str="I900")
         res = w.label.filter(langtag="en")
-        self.assertEquals(len(res), 1)
+        self.assertGreaterEqual(len(res), 1)
+
+        labels = w.label.all()
+
+        IPS()
 
         q = "sta"
         res = models.Entity.objects.filter(
