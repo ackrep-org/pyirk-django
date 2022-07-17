@@ -38,12 +38,16 @@ def get_item(request):
 
         for idx, db_entity in enumerate(entities):
             db_entity: Entity
-
-            payload.append(
-                render_entity_inline(
-                    db_entity, idx=idx, script_tag="script", include_description=True, highlight_text=q
+            try:
+                res = render_entity_inline(
+                        db_entity, idx=idx, script_tag="script", include_description=True, highlight_text=q
                 )
-            )
+            except KeyError:
+                # there seemse to be a bug related to data reloading and automatic key generation
+                # IPS()
+                raise
+
+            payload.append(res)
 
     return JsonResponse({"status": 200, "data": payload})
 
