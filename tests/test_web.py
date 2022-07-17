@@ -43,7 +43,7 @@ class TestMainApp1(TestCase):
 
         for tag in script_tags:
             # this assumes that Item I13 has not changed its label since the test was written
-            if tag.contents and (tag.contents[0] == '\\"I13(\\\\\\"mathematical set\\\\\\")\\"'):
+            if tag.contents and (tag.contents[0] == '\\"I13[\\\\\\"mathematical set\\\\\\"]\\"'):
                 break
         else:
             self.assertTrue(False, "could not find expected copy-string in response")
@@ -60,7 +60,7 @@ class TestMainApp1(TestCase):
             <span class="entity-key highlight"><a href="/e/I12">I12</a></span><!--
             --><!--
             --><!--
-            -->("<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>")<!--
+            -->["<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>"]<!--
             -->
             <div class="entity-description">base class for any knowledge object of interrest in the field of mathematics</div>
             """
@@ -70,6 +70,10 @@ class TestMainApp1(TestCase):
         url = "/search/?q=bound"
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
+
+    def test_entity_detail_view2(self):
+        url = reverse("entitypage", kwargs=dict(key_str="I9907"))
+        res = self.client.get(url)
 
     def test_sparql_page(self):
         url = reverse("sparqlpage")
@@ -97,8 +101,6 @@ class TestMainApp1(TestCase):
         self.assertGreaterEqual(len(res), 1)
 
         labels = w.label.all()
-
-        IPS()
 
         q = "sta"
         res = models.Entity.objects.filter(

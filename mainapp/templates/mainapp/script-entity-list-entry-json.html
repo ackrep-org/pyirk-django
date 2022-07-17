@@ -7,7 +7,7 @@
 
 {% if c.script_tag %}
     <{{c.script_tag}} id="result_url_{{c.idx}}" type="application/json">"{{c.detail_url}}"</{{c.script_tag}}>
-    <{{c.script_tag}} id="copy_text_{{c.idx}}" type="application/json">"{{c.short_key}}(\"{{c.label}}\")"</{{c.script_tag}}>
+    <{{c.script_tag}} id="copy_text_{{c.idx}}" type="application/json">"{{c.short_key}}[\"{{c.label}}\"]"</{{c.script_tag}}>
 {% else %}
 <!--no json-script included -->
 {% endif %}
