@@ -18,6 +18,10 @@ from ipydex import IPS
 from .models import Entity
 
 
+# when this module is loaded (i.e. when the server starts) we also want to load the data (for convenience)
+util.reload_data()
+
+
 def home_page_view(request):
 
     context = dict(greeting_message="Hello, World!")
