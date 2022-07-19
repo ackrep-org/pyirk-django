@@ -1,4 +1,5 @@
 import itertools
+from django.db.utils import OperationalError
 import pyerk
 from .models import Entity, LanguageSpecifiedString as LSS
 
@@ -17,8 +18,12 @@ def reload_data(omit_reload=False) -> None:
         # this was an omited reload
         return
 
-    # delete all existing data
-    Entity.objects.all().delete()
+    # delete all existing data (if database already exisits)
+    try:
+        Entity.objects.all().delete()
+    except OperationalError:
+        # db does not yet exist. The functions is probably called during `manage.py migrate` or similiar.
+        return
 
     # TODO: remove dublications
 
@@ -33,5 +38,12 @@ def reload_data(omit_reload=False) -> None:
 
 
 def create_lss(ent: pyerk.Entity, rel_key: str) -> LSS:
+    """
+    Create a language specified string (see models.LanguageSpecifiedString)
+
+    :param ent:
+    :param rel_key:
+    :return:
+    """
     rdf_literal = pyerk.aux.ensure_rdf_str_literal(getattr(ent, rel_key, ""))
     return LSS.objects.create(langtag=rdf_literal.language, content=rdf_literal.value)
