@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional, Dict
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
@@ -16,6 +16,7 @@ from addict import Dict as attr_dict
 from ipydex import IPS
 
 from .models import Entity
+from . import vis_integration
 
 
 # when this module is loaded (i.e. when the server starts) we also want to load the data (for convenience)
@@ -64,7 +65,7 @@ def mockup(request):
     return render(request, "mainapp/page-mockup.html", context)
 
 
-def entity_view(request, key_str=None):
+def entity_view(request, key_str=None, vis_options: Optional[Dict] = None):
 
     db_entity = get_object_or_404(Entity, key_str=key_str)
     rendered_entity = render_entity_inline(db_entity, special_class="highlight", include_description=True)
@@ -72,14 +73,22 @@ def entity_view(request, key_str=None):
     # rendered_entity_context_vars = render_entity_context_vars(db_entity)
     rendered_entity_scopes = render_entity_scopes(db_entity)
 
+    rendered_vis_result = vis_integration.create_visualization(db_entity, vis_options)
+
     context = dict(
         rendered_entity=rendered_entity,
         entity=db_entity,
         rendered_entity_relations=rendered_entity_relations,
         # rendered_entity_context_vars=rendered_entity_context_vars,
         rendered_entity_scopes=rendered_entity_scopes,
+        rendered_vis_result=rendered_vis_result
     )
     return render(request, "mainapp/page-entity-detail.html", context)
+
+
+def entity_visualization_view(request, key_str=None):
+    vis_dict = {"depth": 1}
+    return entity_view(request, key_str, vis_options=vis_dict)
 
 
 def render_entity_inline(entity: Union[Entity, pyerk.Entity], **kwargs) -> str:

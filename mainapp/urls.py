@@ -9,6 +9,7 @@ urlpatterns = [
     path(r"reload/", views.reload_data_redirect, name="reload"),
     path("sparql/", views.SearchSparqlView.as_view(), name="sparqlpage"),
     path(r"e/<str:key_str>", views.entity_view, name="entitypage"),
+    path(r"e/<str:key_str>/v", views.entity_visualization_view, name="entityvisualization"),
     path(r"debug", views.debug_view, name="debugpage0"),
     path(r"debug/<int:xyz>", views.debug_view, name="debugpage_with_argument"),
 ]

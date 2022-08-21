@@ -74,6 +74,8 @@ class TestMainApp1(TestCase):
     def test_entity_detail_view2(self):
         url = reverse("entitypage", kwargs=dict(key_str="I9907"))
         res = self.client.get(url)
+        # TODO: add some actual test code here (which was probaly forgotten earlier)
+        # likely it was intended to test context-rendering
 
     def test_sparql_page(self):
         url = reverse("sparqlpage")
@@ -107,3 +109,11 @@ class TestMainApp1(TestCase):
             Q(label__content__icontains=q) | Q(key_str__icontains=q) | Q(description__icontains=q)
         )
         self.assertGreater(len(res), 5)
+
+    def test_visualization1(self):
+        url = reverse("entityvisualization", kwargs=dict(key_str="I9907"))
+        res = self.client.get(url)
+
+        test_str = "utc_visualization_of_I9907"
+        content = res.content.decode("utf8")
+        self.assertIn(test_str, content)
