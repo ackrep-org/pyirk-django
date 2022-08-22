@@ -110,7 +110,7 @@ class TestMainApp1(TestCase):
         )
         self.assertGreater(len(res), 5)
 
-    def test_visualization1(self):
+    def test_web_visualization1(self):
         url = reverse("entityvisualization", kwargs=dict(key_str="I9907"))
         res = self.client.get(url)
 

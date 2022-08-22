@@ -152,7 +152,7 @@ def allow_attributes(tag, name, value):
     #     return True
     elif tag == "myscript":
         # Unfortunately, bleach checks every tag separately. To allow `<script type="application/json">
-        # script has to be allowed in general. If the type-attributedoes not match the rule then only
+        # script has to be allowed in general. If the type-attribute does not match the rule then only
         # the attribute is stripped, leaving potential harmful code inside <script>.
 
         # Thus we introduce a fake tag `myscipt` which will be handled and checked by a custom filter

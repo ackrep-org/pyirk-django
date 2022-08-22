@@ -14,7 +14,8 @@
 {{rendered_entity_scopes|bleach}}
 {% if rendered_vis_result %}
 <hr style="margin:1rem;">
-    {{rendered_vis_result|bleach}}
+    {{rendered_vis_result|safe}}
+
 {% endif %}
 
 

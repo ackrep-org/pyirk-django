@@ -20,7 +20,7 @@ class LanguageSpecifiedString(BaseModel):
 class Entity(BaseModel):
     id = models.BigAutoField(primary_key=True)
 
-    # TODO: this should be renamed to `short_key`
+    # TODO: this should be renamed to `short_key` (first step: see property `short_key` below)
     key_str = models.TextField(default="(unknown key)")
 
     # note: in reality this a one-to-many-relationship which in principle could be modeled by a ForeignKeyField
@@ -41,5 +41,9 @@ class Entity(BaseModel):
 
     def __str__(self) -> str:
         return self.get_label()
+
+    @property
+    def short_key(self):
+        return self.key_str
 
 
