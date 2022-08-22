@@ -117,3 +117,6 @@ class TestMainApp1(TestCase):
         test_str = "utc_visualization_of_I9907"
         content = res.content.decode("utf8")
         self.assertIn(test_str, content)
+
+        # test if labels have links:
+        self.assertIn('<a href="/e/I9906/v/">I9906', content)
