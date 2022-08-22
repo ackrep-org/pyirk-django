@@ -45,7 +45,7 @@ def get_item(request):
             db_entity: Entity
             try:
                 res = render_entity_inline(
-                        db_entity, idx=idx, script_tag="script", include_description=True, highlight_text=q
+                    db_entity, idx=idx, script_tag="script", include_description=True, highlight_text=q
                 )
             except KeyError:
                 # there seemse to be a bug related to data reloading and automatic key generation
@@ -81,7 +81,7 @@ def entity_view(request, key_str=None, vis_options: Optional[Dict] = None):
         rendered_entity_relations=rendered_entity_relations,
         # rendered_entity_context_vars=rendered_entity_context_vars,
         rendered_entity_scopes=rendered_entity_scopes,
-        rendered_vis_result=rendered_vis_result
+        rendered_vis_result=rendered_vis_result,
     )
     return render(request, "mainapp/page-entity-detail.html", context)
 
@@ -254,7 +254,7 @@ def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
             "description": str(code_entity.R2),
             "detail_url": reverse("entitypage", kwargs={"key_str": code_entity.short_key}),
             "template": "mainapp/widget-entity-inline.html",
-            "_replacement_exceptions": _replacement_exceptions
+            "_replacement_exceptions": _replacement_exceptions,
         }
     else:
         # assume we have a literal

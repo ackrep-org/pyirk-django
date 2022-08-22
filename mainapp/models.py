@@ -5,6 +5,7 @@ from django.conf import settings
 class BaseModel(models.Model):
     class Meta:
         abstract = True
+
     objects = models.Manager()  # make PyCharm happy
 
 
@@ -45,5 +46,3 @@ class Entity(BaseModel):
     @property
     def short_key(self):
         return self.key_str
-
-

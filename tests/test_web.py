@@ -119,4 +119,4 @@ class TestMainApp1(TestCase):
         self.assertIn(test_str, content)
 
         # test if labels have links:
-        self.assertIn('<a href="/e/I9906/v/">I9906', content)
+        self.assertIn('<a href="/e/I9906/v">I9906', content)

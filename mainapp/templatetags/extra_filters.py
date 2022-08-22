@@ -10,12 +10,13 @@ register = template.Library()
 
 # see https://python-markdown.github.io/reference/#extensions
 md_ext = mdx_math.MathExtension(enable_dollar_delimiter=True)
-md = markdown.Markdown(extensions=['extra', md_ext])
+md = markdown.Markdown(extensions=["extra", md_ext])
 
 
 @register.filter
 def render_markdown(txt):
     return md.convert(txt)
+
 
 # maybe a restart of the server is neccessary after chanching this file
 
@@ -52,7 +53,7 @@ def allow_json_script(src):
     :return:
     """
 
-    bs = BeautifulSoup(src, 'html.parser')
+    bs = BeautifulSoup(src, "html.parser")
     res = bs.find_all("myscript")
     for tag in res:
         if tag.attrs.get("type") == "application/json":
