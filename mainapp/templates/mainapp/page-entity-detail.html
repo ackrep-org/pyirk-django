@@ -6,17 +6,22 @@
 {% block content %}
 <h2>Details for Entity</h2>
 
+{% if rendered_vis_result %}
+<div class="svg-content">
+    {{rendered_vis_result|safe}}
+</div>
+<hr style="margin:1rem;">
+
+{% endif %}
 
 {{rendered_entity|bleach|allow_json_script}}
 <hr style="margin:1rem;">
 {{rendered_entity_relations|bleach}}
+{% if rendered_entity_scopes %}
 <hr style="margin:1rem;">
 {{rendered_entity_scopes|bleach}}
-{% if rendered_vis_result %}
-<hr style="margin:1rem;">
-    {{rendered_vis_result|safe}}
-
 {% endif %}
+
 
 
 {% endblock %}
