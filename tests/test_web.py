@@ -118,5 +118,21 @@ class TestMainApp1(TestCase):
         content = res.content.decode("utf8")
         self.assertIn(test_str, content)
 
-        # test if labels have links:
+        # test if labels have visualization links:
+
         self.assertIn('<a href="/e/I9906/v">I9906', content)
+
+        url2 = reverse("entityvisualization", kwargs=dict(key_str="I9906"))
+        self.assertIn(url2, content)
+
+        # test label formating
+
+        soup = BeautifulSoup(content, "lxml")
+        svg_tag = soup.findAll("svg")[0]
+
+        link1, link2 = svg_tag.findAll(name="a", attrs={"href": url2})
+
+        self.assertEqual(link1.parent.parent.name, "g")
+        self.assertEqual(link1.parent.parent.get("class"), ["node"])
+        self.assertEqual(link1.text, "I9906")
+        self.assertEqual(link2.text, '["square matrix"]')
