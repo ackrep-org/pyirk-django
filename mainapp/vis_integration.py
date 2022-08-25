@@ -15,6 +15,6 @@ def create_visualization(db_entity, vis_options: dict) -> Union[None, str]:
         return None
 
     url_template = reverse("entityvisualization", kwargs=dict(key_str="__xxx__")).replace("__xxx__", "{short_key}")
-    svg_data = visualization.visualize_entity(db_entity.short_key, return_svg_data=True, url_template=url_template)
+    svg_data = visualization.visualize_entity(db_entity.short_key, url_template=url_template)
 
-    return f"<!-- utc_visualization_of_{db_entity.short_key} --> \n{svg_data.decode('utf8')}"
+    return f"<!-- utc_visualization_of_{db_entity.short_key} --> \n{svg_data}"
