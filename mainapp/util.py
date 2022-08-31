@@ -58,6 +58,7 @@ def _load_entities_to_db(speedup: bool) -> None:
     finally:
         if speedup:
             from ipydex import IPS, activate_ips_on_exception
+
             transaction.set_autocommit(True)
 
 
@@ -69,6 +70,7 @@ def __load_entities_to_db(speedup: bool) -> None:
     """
 
     import time
+
     t0 = time.time()
     entity_list = []
     label_list = []

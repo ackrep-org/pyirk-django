@@ -348,6 +348,7 @@ def debug_view(request, xyz=0):
         return HttpResponseServerError("Errormessage")
 
     import os
+
     txt = f"""
     {os.getcwd()}
 

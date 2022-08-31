@@ -19,6 +19,7 @@ from mainapp import models
 
 settings.RUNNING_TESTS = True
 
+
 # we need TransactionTestCase instead of simpler (and faster) TestCase because of the non-atomic way
 class TestMainApp1(TestCase):
     def setUp(self):
