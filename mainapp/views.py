@@ -1,4 +1,4 @@
-from typing import Union, Optional, Dict
+from typing import Union, Optional, Dict, Tuple
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
@@ -30,6 +30,33 @@ def home_page_view(request):
     return render(request, "mainapp/page-landing.html", context)
 
 
+def _entity_sort_key(entity) -> Tuple[str, int]:
+    """
+    Convert an short_key of an entity to a tuple which is used for sorting.
+
+    (Reminder: second character is either a digit or "a" for autocreted items)
+
+    "I25" -> ("I", 25)
+    "I1200" -> ("I", 1200)      (should come after I25)
+    "Ia1100" -> ("xI", 8234)    (auto-created items should come last)
+
+
+    :param entity:
+    :return:
+    """
+    sk = entity.short_key
+
+    if sk[1].isdigit():
+        num = int(sk[1:])
+        letter = sk[0]
+        # return
+    else:
+        num = int(sk[2:])
+        letter = f"x{sk[0]}"
+
+    return letter, num
+
+
 # /search/?q=...
 def get_item(request):
 
@@ -41,7 +68,10 @@ def get_item(request):
             Q(label__content__icontains=q) | Q(key_str__icontains=q) | Q(description__icontains=q)
         )
 
-        for idx, db_entity in enumerate(entities):
+        entity_list = list(entities)
+        entity_list.sort(key=_entity_sort_key)
+
+        for idx, db_entity in enumerate(entity_list):
             db_entity: Entity
             try:
                 res = render_entity_inline(

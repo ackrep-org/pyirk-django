@@ -41,7 +41,8 @@ class Entity(BaseModel):
             return res[0].content
 
     def __str__(self) -> str:
-        return self.get_label()
+        label_str = self.get_label().replace(" ", "_")
+        return f"{self.short_key}__{label_str}"
 
     @property
     def short_key(self):
