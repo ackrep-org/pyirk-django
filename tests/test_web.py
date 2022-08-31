@@ -1,8 +1,9 @@
-from django.test import TestCase
+from django.test import TransactionTestCase, TestCase
 from django.urls import reverse
 from django.db.models import Q
 from textwrap import dedent as twdd
 from ipydex import IPS
+from django.conf import settings
 
 from bs4 import BeautifulSoup
 
@@ -17,9 +18,15 @@ from mainapp import models
 # `python manage.py test --rednose` # with colors
 
 
+# we need TransactionTestCase instead of simpler (and faster) TestCase because of the non-atomic way
 class TestMainApp1(TestCase):
     def setUp(self):
-        mainapp.util.reload_data()
+
+        settings.RUNNING_TESTS = True
+
+        # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
+        print("In method", mainapp.util.aux.bgreen(self._testMethodName))
+        mainapp.util.reload_data(speedup=False)
 
     def test_home_page1(self):
 
