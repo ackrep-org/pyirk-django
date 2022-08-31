@@ -17,12 +17,11 @@ from mainapp import models
 # `python manage.py test`
 # `python manage.py test --rednose` # with colors
 
+settings.RUNNING_TESTS = True
 
 # we need TransactionTestCase instead of simpler (and faster) TestCase because of the non-atomic way
 class TestMainApp1(TestCase):
     def setUp(self):
-
-        settings.RUNNING_TESTS = True
 
         # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
         print("In method", mainapp.util.aux.bgreen(self._testMethodName))
