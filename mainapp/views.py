@@ -317,4 +317,10 @@ def debug_view(request, xyz=0):
     elif xyz == 2:
         return HttpResponseServerError("Errormessage")
 
-    return HttpResponse(f"Some plain message {xyz}")
+    import os
+    txt = f"""
+    {os.getcwd()}
+
+    {pyerk.auxiliary.get_erk_root_dir()}
+    """
+    return HttpResponse(f"Some plain message {xyz}; {txt}")
