@@ -1,5 +1,6 @@
 import itertools
 from django.db.utils import OperationalError
+from django.conf import settings
 import pyerk
 from .models import Entity, LanguageSpecifiedString as LSS
 
@@ -11,7 +12,7 @@ def reload_data(omit_reload=False) -> None:
     """
 
     mod = pyerk.erkloader.load_mod_from_path(
-        "../controltheory_experiments/knowledge_base1.py", "knowledge_base1", omit_reload=omit_reload
+        settings.ERK_DATA_PATH, settings.ERK_DATA_MOD_NAME, omit_reload=omit_reload
     )
 
     if mod is None:
