@@ -6,19 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mainapp', '0005_rename_item_entity'),
+        ("mainapp", "0005_rename_item_entity"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='LanguageSpecifiedString',
+            name="LanguageSpecifiedString",
             fields=[
-                ('id', models.BigAutoField(primary_key=True, serialize=False)),
-                ('langtag', models.CharField(default='', max_length=8)),
-                ('content', models.TextField(null=True)),
+                ("id", models.BigAutoField(primary_key=True, serialize=False)),
+                ("langtag", models.CharField(default="", max_length=8)),
+                ("content", models.TextField(null=True)),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
     ]

@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('mainapp', '0006_languagespecifiedstring'),
+        ("mainapp", "0006_languagespecifiedstring"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='entity',
-            name='label',
+            model_name="entity",
+            name="label",
         ),
         migrations.AddField(
-            model_name='entity',
-            name='label',
-            field=models.ManyToManyField(to='mainapp.LanguageSpecifiedString'),
+            model_name="entity",
+            name="label",
+            field=models.ManyToManyField(to="mainapp.LanguageSpecifiedString"),
         ),
     ]
