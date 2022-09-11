@@ -1,10 +1,10 @@
 from typing import Union, Optional, Dict, Tuple
+import urllib
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
 from django.template.loader import get_template
 from django.views import View
-from django.urls import reverse
 from django.db.models import Q
 from textwrap import dedent as twdd
 from tabulate import tabulate
@@ -44,7 +44,9 @@ def _entity_sort_key(entity) -> Tuple[str, int]:
     :param entity:
     :return:
     """
-    sk = entity.short_key
+
+    uri = entity.uri
+    mod_uri, sk = uri.split(pyerk.settings.URI_SEP)
 
     if sk[1].isdigit():
         num = int(sk[1:])
@@ -65,7 +67,7 @@ def get_item(request):
     payload = []
     if q:
         entities = Entity.objects.filter(
-            Q(label__content__icontains=q) | Q(key_str__icontains=q) | Q(description__icontains=q)
+            Q(label__content__icontains=q) | Q(uri__icontains=q) | Q(description__icontains=q)
         )
 
         entity_list = list(entities)
@@ -88,16 +90,19 @@ def get_item(request):
 
 
 def mockup(request):
-    db_entity = get_object_or_404(Entity, key_str="I5")
+    db_entity = get_object_or_404(Entity, uri=pyerk.u("I5"))
     rendered_entity = render_entity_inline(db_entity, idx=23, script_tag="myscript", include_description=True)
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
 
     return render(request, "mainapp/page-mockup.html", context)
 
 
-def entity_view(request, key_str=None, vis_options: Optional[Dict] = None):
+def entity_view(request, uri: Optional[str] = None, vis_options: Optional[Dict] = None):
 
-    db_entity = get_object_or_404(Entity, key_str=key_str)
+    # noinspection PyUnresolvedReferences
+    uri = urllib.parse.unquote(uri)
+
+    db_entity = get_object_or_404(Entity, uri=uri)
     rendered_entity = render_entity_inline(db_entity, special_class="highlight", include_description=True)
     rendered_entity_relations = render_entity_relations(db_entity)
     # rendered_entity_context_vars = render_entity_context_vars(db_entity)
@@ -116,9 +121,9 @@ def entity_view(request, key_str=None, vis_options: Optional[Dict] = None):
     return render(request, "mainapp/page-entity-detail.html", context)
 
 
-def entity_visualization_view(request, key_str=None):
+def entity_visualization_view(request, uri: Optional[str] = None):
     vis_dict = {"depth": 1}
-    return entity_view(request, key_str, vis_options=vis_dict)
+    return entity_view(request, uri, vis_options=vis_dict)
 
 
 def render_entity_inline(entity: Union[Entity, pyerk.Entity], **kwargs) -> str:
@@ -127,7 +132,7 @@ def render_entity_inline(entity: Union[Entity, pyerk.Entity], **kwargs) -> str:
     if isinstance(entity, pyerk.Entity):
         code_entity = entity
     elif isinstance(entity, Entity):
-        code_entity = pyerk.ds.get_entity(entity.key_str)
+        code_entity = pyerk.ds.get_entity_by_uri(entity.uri)
     else:
         # TODO: improve handling of literal values
         assert isinstance(entity, (str, int, float, complex))
@@ -168,14 +173,14 @@ def render_entity_relations(db_entity: Entity) -> str:
 
     # omit information which is already displayed by render_entity (label, description)
     black_listed_keys = ["R1", "R2"]
-    short_key = db_entity.key_str
+    uri = db_entity.uri
 
     # #########################################################################
     # frist: handle direct relations (where `db_entity` is subject)
     # #########################################################################
 
     # dict like {"R1": [<RelationEdge 1234>, ...], "R2": [...]}
-    relation_edges0 = pyerk.ds.relation_edges[short_key]
+    relation_edges0 = pyerk.ds.relation_edges[uri]
 
     # create a flat list of template-friendly dicts
     re_dict_2tuples = []
@@ -193,7 +198,7 @@ def render_entity_relations(db_entity: Entity) -> str:
     # #########################################################################
 
     # dict like {"R4": [<RelationEdge 1234>, ...], "R8": [...]}
-    inv_relation_edges0 = pyerk.ds.inv_relation_edges[short_key]
+    inv_relation_edges0 = pyerk.ds.inv_relation_edges[uri]
 
     # create a flat list of template-friendly dicts
     inv_re_dict_2tuples = []
@@ -211,7 +216,7 @@ def render_entity_relations(db_entity: Entity) -> str:
     # #########################################################################
 
     ctx = {
-        "main_entity": {"special_class": "highlight", **represent_entity_as_dict(pyerk.ds.get_entity(short_key))},
+        "main_entity": {"special_class": "highlight", **represent_entity_as_dict(pyerk.ds.get_entity_by_uri(uri))},
         "re_dict_2tuples": re_dict_2tuples,
         "inv_re_dict_2tuples": inv_re_dict_2tuples,
     }
@@ -222,7 +227,7 @@ def render_entity_relations(db_entity: Entity) -> str:
 
 
 def render_entity_scopes(db_entity: Entity) -> str:
-    code_entity = pyerk.ds.get_entity(db_entity.key_str)
+    code_entity = pyerk.ds.get_entity_by_uri(db_entity.uri)
     # noinspection PyProtectedMember
 
     scopes = pyerk.get_scopes(code_entity)
@@ -265,7 +270,6 @@ def render_entity_scopes(db_entity: Entity) -> str:
     return render_result
 
 
-# noinspection PyUnresolvedReferences
 def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
 
     if isinstance(code_entity, pyerk.Entity):
@@ -282,7 +286,7 @@ def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
             "short_key": code_entity.short_key,
             "label": generalized_label,
             "description": str(code_entity.R2),
-            "detail_url": reverse("entitypage", kwargs={"key_str": code_entity.short_key}),
+            "detail_url": util.q_reverse("entitydetail", uri=code_entity.uri),
             "template": "mainapp/widget-entity-inline.html",
             "_replacement_exceptions": _replacement_exceptions,
         }

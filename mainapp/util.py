@@ -1,10 +1,16 @@
 import itertools
+import urllib
 from django.db.utils import OperationalError
 from django.conf import settings
 from django.db import transaction
+from django.urls import reverse
 
 import pyerk
-import pyerk.auxiliary as aux
+# noinspection PyUnresolvedReferences
+from pyerk import (
+    u,  # convenience function to convert a key into an URI
+    auxiliary as aux,
+)
 from .models import Entity, LanguageSpecifiedString as LSS
 
 
@@ -76,7 +82,7 @@ def __load_entities_to_db(speedup: bool) -> None:
     label_list = []
     for ent in itertools.chain(pyerk.ds.items.values(), pyerk.ds.relations.values()):
         label = create_lss(ent, "R1")
-        entity = Entity(key_str=ent.short_key, description=getattr(ent, "R2", None))
+        entity = Entity(uri=ent.uri, description=getattr(ent, "R2", None))
 
         label_list.append(label)
         entity_list.append(entity)
@@ -105,3 +111,38 @@ def create_lss(ent: pyerk.Entity, rel_key: str) -> LSS:
     """
     rdf_literal = pyerk.aux.ensure_rdf_str_literal(getattr(ent, rel_key, ""))
     return LSS(langtag=rdf_literal.language, content=rdf_literal.value)
+
+
+def urlquote(txt):
+    # noinspection PyUnresolvedReferences
+    return urllib.parse.quote(txt, safe="")
+
+
+def w(key_str: str) -> str:
+    """
+    Call pyerk.u(*args) (convert (builtin) key to uri) and pass it through urlib.parse.quote
+
+    :param key_str:     see pyerk.u
+    :return:
+    """
+
+    res = pyerk.u(key_str)
+    return urlquote(res)
+
+
+def q_reverse(pagename, uri, **kwargs):
+    """
+    Simplifies the hazzle for passing URIs into `reverse` (they must be percent-encoded therefor, aka quoted), and then
+    unqoting the result again.
+
+
+    :param pagename:
+    :param uri:
+    :param kwargs:
+    :return:
+    """
+
+    quoted_url = reverse("entitypage", kwargs={"uri": urlquote(uri)})
+
+    # noinspection PyUnresolvedReferences
+    return urllib.parse.unquote(quoted_url)

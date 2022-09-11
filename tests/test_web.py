@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 
 # noinspection PyUnresolvedReferences
 import mainapp.util
+import pyerk
 
 # noinspection PyUnresolvedReferences
 from mainapp import models
@@ -17,7 +18,12 @@ from mainapp import models
 # `python manage.py test`
 # `python manage.py test --rednose` # with colors
 
+# this is relevant for switching of some database optimizations which are incompatible with django.test.TestCase
+# because every testcase rewinds its transactions
 settings.RUNNING_TESTS = True
+
+# noinspection PyUnresolvedReferences
+from mainapp.util import w, u
 
 
 # we need TransactionTestCase instead of simpler (and faster) TestCase because of the non-atomic way
@@ -56,15 +62,17 @@ class TestMainApp1(TestCase):
             self.assertTrue(False, "could not find expected copy-string in response")
 
     def test_entity_detail_view(self):
-
-        url = reverse("entitypage", kwargs=dict(key_str="I12"))
+        url = reverse("entitypage", kwargs=dict(uri=w("I12")))
         res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
         content = res.content.decode("utf8")
-        self.assertIn('<span class="entity-key highlight"><a href="/e/I12">I12</a></span>', content)
+        self.assertIn(
+            '<span class="entity-key highlight"><a href="/e/erk%3A%2Fbuiltins%23I12">I12</a></span>', content
+        )
 
         src1 = twdd(
             """
-            <span class="entity-key highlight"><a href="/e/I12">I12</a></span><!--
+            <span class="entity-key highlight"><a href="/e/erk%3A%2Fbuiltins%23I12">I12</a></span><!--
             --><!--
             --><!--
             -->["<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>"]<!--
@@ -79,7 +87,7 @@ class TestMainApp1(TestCase):
         self.assertEquals(res.status_code, 200)
 
     def test_entity_detail_view2(self):
-        url = reverse("entitypage", kwargs=dict(key_str="I9907"))
+        url = reverse("entitypage", kwargs=dict(uri=w("I9907")))
         res = self.client.get(url)
         # TODO: add some actual test code here (which was probaly forgotten earlier)
         # likely it was intended to test context-rendering
@@ -105,20 +113,20 @@ class TestMainApp1(TestCase):
         self.assertGreaterEqual(len(res), 1)
 
         self.assertIn(t2, res)
-        w = models.Entity.objects.get(key_str="I900")
-        res = w.label.filter(langtag="en")
+        x = models.Entity.objects.get(uri=u("I900"))
+        res = x.label.filter(langtag="en")
         self.assertGreaterEqual(len(res), 1)
 
-        labels = w.label.all()
+        labels = x.label.all()
 
         q = "sta"
         res = models.Entity.objects.filter(
-            Q(label__content__icontains=q) | Q(key_str__icontains=q) | Q(description__icontains=q)
+            Q(label__content__icontains=q) | Q(uri__icontains=q) | Q(description__icontains=q)
         )
         self.assertGreater(len(res), 5)
 
     def test_web_visualization1(self):
-        url = reverse("entityvisualization", kwargs=dict(key_str="I9907"))
+        url = reverse("entityvisualization", kwargs=dict(uri="I9907"))
         res = self.client.get(url)
 
         test_str = "utc_visualization_of_I9907"
@@ -129,7 +137,7 @@ class TestMainApp1(TestCase):
 
         self.assertIn('<a href="/e/I9906/v">I9906', content)
 
-        url2 = reverse("entityvisualization", kwargs=dict(key_str="I9906"))
+        url2 = reverse("entityvisualization", kwargs=dict(uri="I9906"))
         self.assertIn(url2, content)
 
         # test label formating

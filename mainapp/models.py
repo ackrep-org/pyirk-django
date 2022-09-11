@@ -22,7 +22,7 @@ class Entity(BaseModel):
     id = models.BigAutoField(primary_key=True)
 
     # TODO: this should be renamed to `short_key` (first step: see property `short_key` below)
-    key_str = models.TextField(default="(unknown key)")
+    uri = models.TextField(default="(unknown uri)")
 
     # note: in reality this a one-to-many-relationship which in principle could be modeled by a ForeignKeyField
     # on the other side. However, as we might use the LanguageSpecifiedString model also on other fields (e.g.
@@ -42,8 +42,10 @@ class Entity(BaseModel):
 
     def __str__(self) -> str:
         label_str = self.get_label().replace(" ", "_")
-        return f"{self.short_key}__{label_str}"
+        # TODO introduce prefixes
+        return f"{self.uri}__{label_str}"
 
-    @property
-    def short_key(self):
-        return self.key_str
+    # TODO: remove obsolete short_key
+    # @property
+    # def short_key(self):
+    #     return self.uri
