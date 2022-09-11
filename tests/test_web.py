@@ -1,3 +1,5 @@
+import os
+
 from django.test import TransactionTestCase, TestCase
 from django.urls import reverse
 from django.db.models import Q
@@ -25,6 +27,8 @@ settings.RUNNING_TESTS = True
 # noinspection PyUnresolvedReferences
 from mainapp.util import w, u
 
+ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
+TEST_DATA_PATH2 = os.path.join(ERK_ROOT_DIR, "erk-data", "control-theory", "control_theory1.py")
 
 # we need TransactionTestCase instead of simpler (and faster) TestCase because of the non-atomic way
 class TestMainApp1(TestCase):
@@ -87,8 +91,11 @@ class TestMainApp1(TestCase):
         self.assertEquals(res.status_code, 200)
 
     def test_entity_detail_view2(self):
-        url = reverse("entitypage", kwargs=dict(uri=w("I9907")))
+        # test displaying an entity from a loaded module
+        mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
+        url = reverse("entitypage", kwargs=dict(uri=w("ct__I9907")))
         res = self.client.get(url)
+        self.assertEquals(res.status_code, 200)
         # TODO: add some actual test code here (which was probaly forgotten earlier)
         # likely it was intended to test context-rendering
 
@@ -126,11 +133,13 @@ class TestMainApp1(TestCase):
         self.assertGreater(len(res), 5)
 
     def test_web_visualization1(self):
-        url = reverse("entityvisualization", kwargs=dict(uri="I9907"))
+        url = reverse("entityvisualization", kwargs=dict(uri=w("I9907")))
         res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
 
         test_str = "utc_visualization_of_I9907"
         content = res.content.decode("utf8")
+        IPS()
         self.assertIn(test_str, content)
 
         # test if labels have visualization links:
