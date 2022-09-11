@@ -26,7 +26,7 @@ def reload_data(omit_reload=False, speedup: bool = True) -> None:
     """
 
     mod = pyerk.erkloader.load_mod_from_path(
-        settings.ERK_DATA_PATH, settings.ERK_DATA_MOD_NAME, omit_reload=omit_reload
+        settings.ERK_DATA_PATH, prefix="ct", modname=settings.ERK_DATA_MOD_NAME, omit_reload=omit_reload
     )
 
     if mod is None:
@@ -142,7 +142,7 @@ def q_reverse(pagename, uri, **kwargs):
     :return:
     """
 
-    quoted_url = reverse("entitypage", kwargs={"uri": urlquote(uri)})
+    quoted_url = reverse(pagename, kwargs={"uri": urlquote(uri)})
 
     # noinspection PyUnresolvedReferences
     return urllib.parse.unquote(quoted_url)

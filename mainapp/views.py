@@ -286,7 +286,7 @@ def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
             "short_key": code_entity.short_key,
             "label": generalized_label,
             "description": str(code_entity.R2),
-            "detail_url": util.q_reverse("entitydetail", uri=code_entity.uri),
+            "detail_url": util.q_reverse("entitypage", uri=code_entity.uri),
             "template": "mainapp/widget-entity-inline.html",
             "_replacement_exceptions": _replacement_exceptions,
         }
