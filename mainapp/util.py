@@ -145,4 +145,4 @@ def q_reverse(pagename, uri, **kwargs):
     quoted_url = reverse(pagename, kwargs={"uri": urlquote(uri)})
 
     # noinspection PyUnresolvedReferences
-    return urllib.parse.unquote(quoted_url)
+    return quoted_url
