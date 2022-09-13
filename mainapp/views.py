@@ -21,6 +21,7 @@ from . import vis_integration
 
 # when this module is loaded (i.e. when the server starts) we also want to load the data (for convenience)
 util.reload_data()
+pyerk.ackrep_parser.parse_ackrep()
 
 
 def home_page_view(request):
@@ -109,6 +110,8 @@ def entity_view(request, uri: Optional[str] = None, vis_options: Optional[Dict] 
     rendered_entity_scopes = render_entity_scopes(db_entity)
 
     rendered_vis_result = vis_integration.create_visualization(db_entity, vis_options)
+    if rendered_vis_result:
+        rendered_vis_result = rendered_vis_result.replace(r"%2F", r"%252F")
 
     context = dict(
         rendered_entity=rendered_entity,
