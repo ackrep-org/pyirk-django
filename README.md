@@ -1,3 +1,4 @@
 # General Information
 
-experimental web frontend for *Easy Representation of Knowledge* (ERK).
+Web frontend for [pyerk](https://github.com/ackrep-org/pyerk-core).
+
