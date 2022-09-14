@@ -110,6 +110,9 @@ def entity_view(request, uri: Optional[str] = None, vis_options: Optional[Dict] 
     rendered_entity_scopes = render_entity_scopes(db_entity)
 
     rendered_vis_result = vis_integration.create_visualization(db_entity, vis_options)
+
+    # TODO: This should be done in vis_integration.create_visualization
+    #  or better: in visualize_entity() (called from there)
     if rendered_vis_result:
         rendered_vis_result = rendered_vis_result.replace(r"%2F", r"%252F")
 

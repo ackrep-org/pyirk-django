@@ -130,6 +130,7 @@ def w(key_str: str) -> str:
     return urlquote(res)
 
 
+# TODO: obsolete
 def q_reverse(pagename, uri, **kwargs):
     """
     Simplifies the hazzle for passing URIs into `reverse` (they must be percent-encoded therefor, aka quoted), and then
