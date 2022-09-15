@@ -28,6 +28,7 @@ def reload_data(omit_reload=False, speedup: bool = True) -> None:
     mod = pyerk.erkloader.load_mod_from_path(
         settings.ERK_DATA_PATH, prefix="ct", modname=settings.ERK_DATA_MOD_NAME, omit_reload=omit_reload
     )
+    pyerk.ackrep_parser.parse_ackrep()
 
     if mod is None:
         # this was an omited reload
@@ -36,6 +37,7 @@ def reload_data(omit_reload=False, speedup: bool = True) -> None:
     # delete all existing data (if database already exisits)
     try:
         Entity.objects.all().delete()
+        LSS.objects.all().delete()
     except OperationalError:
         # db does not yet exist. The functions is probably called during `manage.py migrate` or similiar.
         return
@@ -87,6 +89,7 @@ def __load_entities_to_db(speedup: bool) -> None:
         label_list.append(label)
         entity_list.append(entity)
 
+
     # print(pyerk.auxiliary.bcyan(f"time1: {time.time() - t0}"))
     Entity.objects.bulk_create(entity_list)
     LSS.objects.bulk_create(label_list)
@@ -94,6 +97,8 @@ def __load_entities_to_db(speedup: bool) -> None:
     if speedup:
         transaction.commit()
 
+
+    assert len(Entity.objects.all()) == len(LSS.objects.all()), "Mismatch in Entities and corresponding Labels."
     for entity, label in zip(Entity.objects.all(), LSS.objects.all()):
         entity.label.add(label)
 
