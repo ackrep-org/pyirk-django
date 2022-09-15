@@ -1,4 +1,5 @@
 import os
+import urllib
 
 from django.test import TransactionTestCase, TestCase
 from django.urls import reverse
@@ -26,7 +27,7 @@ from mainapp import models
 settings.RUNNING_TESTS = True
 
 # noinspection PyUnresolvedReferences
-from mainapp.util import w, u, q_reverse
+from mainapp.util import w, u, q_reverse, urlquote
 
 ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
 TEST_DATA_PATH2 = os.path.join(ERK_ROOT_DIR, "erk-data", "control-theory", "control_theory1.py")
@@ -73,12 +74,12 @@ class TestMainApp1(TestCase):
         self.assertEqual(res.status_code, 200)
         content = res.content.decode("utf8")
         self.assertIn(
-            '<span class="entity-key highlight"><a href="/e/erk%3A%2Fbuiltins%23I12">I12</a></span>', content
+            '<span class="entity-key highlight"><a href="/e/erk%253A%252Fbuiltins%2523I12">I12</a></span>', content
         )
 
         src1 = twdd(
             """
-            <span class="entity-key highlight"><a href="/e/erk%3A%2Fbuiltins%23I12">I12</a></span><!--
+            <span class="entity-key highlight"><a href="/e/erk%253A%252Fbuiltins%2523I12">I12</a></span><!--
             --><!--
             --><!--
             -->["<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>"]<!--
@@ -151,11 +152,25 @@ class TestMainApp1(TestCase):
 
         # test if labels have visualization links:
 
-        self.assertIn('<a href="/e/erk%3A%2Focse%2F0.2%23I9906/v">I9906', content)
+        # note: when hovering over the links firefox displays the unquoted version of this url
+        # i.e.: /e/erk:%2Focse%2F0.2#I9906/v
+        txt = '<a href="/e/erk%3A%252Focse%252F0.2%23I9906/v">I9906</a>'
+        self.assertIn(txt, content)
 
-        url2 = q_reverse("entityvisualization", uri=u("ct__I9906"))
+        url_vis = reverse("entityvisualization", kwargs={"uri": urlquote(u("ct__I9906"))})
+        url_vis_empirical = "/e/erk%3A%252Focse%252F0.2%23I9906/v"
+        self.assertIn(url_vis_empirical, content)
 
-        self.assertIn(url2, content)
+        assert url_vis.endswith("/v")
+
+        # the following is necessary due to the temporary replace-hack views.entity_view, see bookmark://vis01
+
+        # noinspection PyUnresolvedReferences
+        url_vis2 = urllib.parse.unquote(url_vis)
+        url_vis3 = urllib.parse.unquote(url_vis2)
+        url_vis_empirical2 = urllib.parse.unquote(url_vis_empirical)
+        url_vis_empirical3 = urllib.parse.unquote(url_vis_empirical2)
+        self.assertEqual(url_vis_empirical3, url_vis3)
 
         # test label formating
 
@@ -163,7 +178,7 @@ class TestMainApp1(TestCase):
         svg_tag = soup.findAll("svg")[0]
 
         # TODO: make this independet of changing data
-        link1, link2 = svg_tag.findAll(name="a", attrs={"href": url2})
+        link1, link2 = svg_tag.findAll(name="a", attrs={"href": url_vis_empirical})
 
         self.assertEqual(link1.parent.parent.name, "g")
         self.assertEqual(link1.parent.parent.get("class"), ["node"])
