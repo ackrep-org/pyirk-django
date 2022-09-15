@@ -21,7 +21,6 @@ from . import vis_integration
 
 # when this module is loaded (i.e. when the server starts) we also want to load the data (for convenience)
 util.reload_data()
-pyerk.ackrep_parser.parse_ackrep()
 
 
 def home_page_view(request):
