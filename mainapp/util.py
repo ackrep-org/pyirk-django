@@ -15,7 +15,7 @@ from pyerk import (
 from .models import Entity, LanguageSpecifiedString as LSS
 
 
-def reload_data_if_necessary(force: bool = True, speedup: bool = True) -> Container:
+def reload_data_if_necessary(force: bool = False, speedup: bool = True) -> Container:
     res = Container()
     res.modules = reload_modules_if_necessary(force=force)
 
@@ -114,7 +114,6 @@ def __load_entities_to_db(speedup: bool) -> None:
         label_list.append(label)
         entity_list.append(entity)
 
-
     # print(pyerk.auxiliary.bcyan(f"time1: {time.time() - t0}"))
     Entity.objects.bulk_create(entity_list)
     LSS.objects.bulk_create(label_list)
@@ -122,12 +121,22 @@ def __load_entities_to_db(speedup: bool) -> None:
     if speedup:
         transaction.commit()
 
-
     assert len(Entity.objects.all()) == len(LSS.objects.all()), "Mismatch in Entities and corresponding Labels."
     for entity, label in zip(Entity.objects.all(), LSS.objects.all()):
         entity.label.add(label)
 
     # print(pyerk.auxiliary.bcyan(f"time2: {time.time() - t0}"))
+
+
+def unload_data(strict=False):
+
+    # unload modules
+    pyerk.unload_mod(pyerk.ackrep_parser.__URI__, strict=strict)
+    pyerk.unload_mod(pyerk.settings.OCSE_URI, strict=strict)
+
+    # unload db
+    Entity.objects.all().delete()
+    LSS.objects.all().delete()
 
 
 def create_lss(ent: pyerk.Entity, rel_key: str) -> LSS:

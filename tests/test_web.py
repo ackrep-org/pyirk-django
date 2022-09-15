@@ -50,9 +50,8 @@ class Test_01_Basics(TestCase):
 class Test_02_MainApp(TestCase):
     def setUp(self):
         print("In method", mainapp.util.aux.bgreen(self._testMethodName))
-        pass
         # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
-        mainapp.util.reload_data(speedup=False)
+        mainapp.util.reload_data_if_necessary(speedup=False)
 
     def test01_home_page1(self):
 

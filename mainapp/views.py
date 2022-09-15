@@ -313,7 +313,8 @@ def reload_data_redirect(request, targeturl=None):
     """
     if targeturl is None:
         targeturl = "/"
-    util.reload_data(omit_reload=False)
+    util.unload_data(strict=False)
+    util.reload_data_if_necessary(force=True)
 
     return HttpResponseRedirect(targeturl)
 
@@ -321,6 +322,7 @@ def reload_data_redirect(request, targeturl=None):
 # this was taken from ackrep
 class SearchSparqlView(View):
     util.reload_data_if_necessary()
+
     def get(self, request):
         context = {}
         c = attr_dict()
