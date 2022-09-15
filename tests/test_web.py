@@ -33,12 +33,25 @@ ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
 TEST_DATA_PATH2 = os.path.join(ERK_ROOT_DIR, "erk-data", "control-theory", "control_theory1.py")
 
 
-# we need TransactionTestCase instead of simpler (and faster) TestCase because of the non-atomic way
-class Test_01_MainApp(TestCase):
-    def setUp(self):
+class Test_01_Basics(TestCase):
+    """
+    Ensure that the testmodule itself works as expected
+    """
+    def test01_home_page(self):
+        url = reverse("landingpage")
+        res = self.client.get(url)
 
-        # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
+    def test02_home_page(self):
+        # load the landing page again to see if tests interact (not wantend)
+        url = reverse("landingpage")
+        res = self.client.get(url)
+
+
+class Test_02_MainApp(TestCase):
+    def setUp(self):
         print("In method", mainapp.util.aux.bgreen(self._testMethodName))
+        pass
+        # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
         mainapp.util.reload_data(speedup=False)
 
     def test01_home_page1(self):

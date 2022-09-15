@@ -4,6 +4,7 @@ from django.db.utils import OperationalError
 from django.conf import settings
 from django.db import transaction
 from django.urls import reverse
+from addict import Addict as Container
 
 import pyerk
 # noinspection PyUnresolvedReferences
@@ -14,36 +15,44 @@ from pyerk import (
 from .models import Entity, LanguageSpecifiedString as LSS
 
 
-def reload_data_if_necessary(**kwargs):
-    conds = (
-        pyerk.settings.BUILTINS_URI in pyerk.ds.uri_prefix_mapping.a,
-        "erk:/ocse/0.2" in pyerk.ds.uri_prefix_mapping.a,
-        pyerk.ackrep_parser.__URI__ in pyerk.ds.uri_prefix_mapping.a,
-    )
+def reload_data_if_necessary(force: bool = True, speedup: bool = True) -> Container:
+    res = Container()
+    res.modules = reload_modules_if_necessary(force=force)
 
-    if not all(conds):
-        reload_data(**kwargs)
+    # TODO: test if db needs to be reloaded
+    res.db = load_erk_entities_to_db(speedup=speedup)
+
+    return res
 
 
-def reload_data(omit_reload=False, speedup: bool = True) -> None:
+def reload_modules_if_necessary(force: bool = False) -> int:
+    count = 0
+
+    # load ocse
+    if force or pyerk.settings.OCSE_URI not in pyerk.ds.uri_prefix_mapping.a:
+        mod = pyerk.erkloader.load_mod_from_path(
+            settings.ERK_DATA_PATH, prefix="ct", modname=settings.ERK_DATA_MOD_NAME,
+        )
+        count += 1
+
+    # load ackrep entities
+    if force or pyerk.ackrep_parser.__URI__ not in pyerk.ds.uri_prefix_mapping.a:
+        pyerk.ackrep_parser.parse_ackrep(base_path=None, strict=True)
+        count += 1
+
+    return count
+
+
+def load_erk_entities_to_db(speedup: bool = True) -> int:
     """
     Load data from python-module into data base to allow simple searching
 
-    :param omit_reload: default False; flag to control whether the module should be reloaded if it was already loaded
     :param speedup:     default True; flag to determine if transaction.set_autocommit(False) should be used
                         this significantly speeds up the start of the development server but does not work well
                         with django.test.TestCase (where we switch it off)
-    :return:
+
+    :return:            number of entities loaded
     """
-
-    mod = pyerk.erkloader.load_mod_from_path(
-        settings.ERK_DATA_PATH, prefix="ct", modname=settings.ERK_DATA_MOD_NAME, omit_reload=omit_reload
-    )
-    pyerk.ackrep_parser.load_ackrep_entities_if_necessary()
-
-    if not mod.__fresh_load__:
-        # this was an omited reload
-        return
 
     # delete all existing data (if database already exisits)
     try:
@@ -51,13 +60,18 @@ def reload_data(omit_reload=False, speedup: bool = True) -> None:
         LSS.objects.all().delete()
     except OperationalError:
         # db does not yet exist. The functions is probably called during `manage.py migrate` or similiar.
-        return
+        return 0
 
     if settings.RUNNING_TESTS:
         speedup = False
 
     # repopulate the databse with items and relations (and auxiliary objects)
     _load_entities_to_db(speedup=speedup)
+
+    n = len(Entity.objects.all())
+    n += len(LSS.objects.all())
+
+    return n
 
 
 def _load_entities_to_db(speedup: bool) -> None:
