@@ -34,14 +34,14 @@ TEST_DATA_PATH2 = os.path.join(ERK_ROOT_DIR, "erk-data", "control-theory", "cont
 
 
 # we need TransactionTestCase instead of simpler (and faster) TestCase because of the non-atomic way
-class TestMainApp1(TestCase):
+class Test_01_MainApp(TestCase):
     def setUp(self):
 
         # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
         print("In method", mainapp.util.aux.bgreen(self._testMethodName))
         mainapp.util.reload_data(speedup=False)
 
-    def test_home_page1(self):
+    def test01_home_page1(self):
 
         # get url by its unique name, see urls.py
 
@@ -53,7 +53,7 @@ class TestMainApp1(TestCase):
         self.assertEquals(res.status_code, 200)
         self.assertContains(res, "utc_landing_page")
 
-    def test_search_api(self):
+    def test02_search_api(self):
         url = "/search/?q=set"
         res = self.client.get(url)
 
@@ -68,7 +68,7 @@ class TestMainApp1(TestCase):
         else:
             self.assertTrue(False, "could not find expected copy-string in response")
 
-    def test_entity_detail_view(self):
+    def test03_entity_detail_view(self):
         url = reverse("entitypage", kwargs=dict(uri=w("I12")))
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
@@ -93,7 +93,7 @@ class TestMainApp1(TestCase):
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
 
-    def test_entity_detail_view2(self):
+    def test04_entity_detail_view2(self):
         # test displaying an entity from a loaded module
         mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         url = reverse("entitypage", kwargs=dict(uri=w("ct__I9907")))
@@ -102,7 +102,7 @@ class TestMainApp1(TestCase):
         # TODO: add some actual test code here (which was probaly forgotten earlier)
         # likely it was intended to test context-rendering
 
-    def test_sparql_page(self):
+    def test05_sparql_page(self):
         url = reverse("sparqlpage")
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
@@ -111,12 +111,12 @@ class TestMainApp1(TestCase):
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
 
-    def test_reload_via_url(self):
+    def test06_reload_via_url(self):
         url = reverse("reload")
         res = self.client.get(url)
         self.assertEquals(res.status_code, 302)
 
-    def test_LanguageSpecifiedString(self):
+    def test07_LanguageSpecifiedString(self):
         t1 = models.LanguageSpecifiedString.objects.create(langtag="en", content="test1")
         t2 = models.LanguageSpecifiedString.objects.create(langtag="de", content="test1")
         res = models.LanguageSpecifiedString.objects.filter(langtag="de")
@@ -135,7 +135,7 @@ class TestMainApp1(TestCase):
         )
         self.assertGreater(len(res), 5)
 
-    def test_web_visualization1(self):
+    def test08_web_visualization1(self):
         mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         self.assertIn("ct", pyerk.ds.uri_prefix_mapping.b)
 
