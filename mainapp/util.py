@@ -14,6 +14,17 @@ from pyerk import (
 from .models import Entity, LanguageSpecifiedString as LSS
 
 
+def reload_data_if_necessary(**kwargs):
+    conds = (
+        pyerk.settings.BUILTINS_URI in pyerk.ds.uri_prefix_mapping.a,
+        "erk:/ocse/0.2" in pyerk.ds.uri_prefix_mapping.a,
+        pyerk.ackrep_parser.__URI__ in pyerk.ds.uri_prefix_mapping.a,
+    )
+
+    if not all(conds):
+        reload_data(**kwargs)
+
+
 def reload_data(omit_reload=False, speedup: bool = True) -> None:
     """
     Load data from python-module into data base to allow simple searching
@@ -28,9 +39,9 @@ def reload_data(omit_reload=False, speedup: bool = True) -> None:
     mod = pyerk.erkloader.load_mod_from_path(
         settings.ERK_DATA_PATH, prefix="ct", modname=settings.ERK_DATA_MOD_NAME, omit_reload=omit_reload
     )
-    pyerk.ackrep_parser.parse_ackrep()
+    pyerk.ackrep_parser.load_ackrep_entities_if_necessary()
 
-    if mod is None:
+    if not mod.__fresh_load__:
         # this was an omited reload
         return
 

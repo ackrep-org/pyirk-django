@@ -19,11 +19,8 @@ from .models import Entity
 from . import vis_integration
 
 
-# when this module is loaded (i.e. when the server starts) we also want to load the data (for convenience)
-util.reload_data()
-
-
 def home_page_view(request):
+    util.reload_data_if_necessary()
 
     context = dict(greeting_message="Hello, World!")
 
@@ -90,6 +87,7 @@ def get_item(request):
 
 
 def mockup(request):
+    util.reload_data_if_necessary()
     db_entity = get_object_or_404(Entity, uri=pyerk.u("I5"))
     rendered_entity = render_entity_inline(db_entity, idx=23, script_tag="myscript", include_description=True)
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
@@ -98,7 +96,7 @@ def mockup(request):
 
 
 def entity_view(request, uri: Optional[str] = None, vis_options: Optional[Dict] = None):
-
+    util.reload_data_if_necessary()
     # noinspection PyUnresolvedReferences
     uri = urllib.parse.unquote(uri)
 
@@ -322,6 +320,7 @@ def reload_data_redirect(request, targeturl=None):
 
 # this was taken from ackrep
 class SearchSparqlView(View):
+    util.reload_data_if_necessary()
     def get(self, request):
         context = {}
         c = attr_dict()
@@ -346,6 +345,7 @@ class SearchSparqlView(View):
 
 
 def debug_view(request, xyz=0):
+    util.reload_data_if_necessary()
 
     z = 1
 
