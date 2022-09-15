@@ -1,4 +1,5 @@
 import os
+import urllib
 
 from django.test import TransactionTestCase, TestCase
 from django.urls import reverse
@@ -26,21 +27,33 @@ from mainapp import models
 settings.RUNNING_TESTS = True
 
 # noinspection PyUnresolvedReferences
-from mainapp.util import w, u, q_reverse
+from mainapp.util import w, u, q_reverse, urlquote
 
 ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
 TEST_DATA_PATH2 = os.path.join(ERK_ROOT_DIR, "erk-data", "control-theory", "control_theory1.py")
 
 
-# we need TransactionTestCase instead of simpler (and faster) TestCase because of the non-atomic way
-class TestMainApp1(TestCase):
+class Test_01_Basics(TestCase):
+    """
+    Ensure that the testmodule itself works as expected
+    """
+    def test01_home_page(self):
+        url = reverse("landingpage")
+        res = self.client.get(url)
+
+    def test02_home_page(self):
+        # load the landing page again to see if tests interact (not wantend)
+        url = reverse("landingpage")
+        res = self.client.get(url)
+
+
+class Test_02_MainApp(TestCase):
     def setUp(self):
-
-        # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
         print("In method", mainapp.util.aux.bgreen(self._testMethodName))
-        mainapp.util.reload_data(speedup=False)
+        # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
+        mainapp.util.reload_data_if_necessary(speedup=False)
 
-    def test_home_page1(self):
+    def test01_home_page1(self):
 
         # get url by its unique name, see urls.py
 
@@ -52,7 +65,7 @@ class TestMainApp1(TestCase):
         self.assertEquals(res.status_code, 200)
         self.assertContains(res, "utc_landing_page")
 
-    def test_search_api(self):
+    def test02_search_api(self):
         url = "/search/?q=set"
         res = self.client.get(url)
 
@@ -67,18 +80,18 @@ class TestMainApp1(TestCase):
         else:
             self.assertTrue(False, "could not find expected copy-string in response")
 
-    def test_entity_detail_view(self):
+    def test03_entity_detail_view(self):
         url = reverse("entitypage", kwargs=dict(uri=w("I12")))
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
         content = res.content.decode("utf8")
         self.assertIn(
-            '<span class="entity-key highlight"><a href="/e/erk%3A%2Fbuiltins%23I12">I12</a></span>', content
+            '<span class="entity-key highlight"><a href="/e/erk%253A%252Fbuiltins%2523I12">I12</a></span>', content
         )
 
         src1 = twdd(
             """
-            <span class="entity-key highlight"><a href="/e/erk%3A%2Fbuiltins%23I12">I12</a></span><!--
+            <span class="entity-key highlight"><a href="/e/erk%253A%252Fbuiltins%2523I12">I12</a></span><!--
             --><!--
             --><!--
             -->["<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>"]<!--
@@ -92,7 +105,7 @@ class TestMainApp1(TestCase):
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
 
-    def test_entity_detail_view2(self):
+    def test04_entity_detail_view2(self):
         # test displaying an entity from a loaded module
         mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         url = reverse("entitypage", kwargs=dict(uri=w("ct__I9907")))
@@ -101,7 +114,7 @@ class TestMainApp1(TestCase):
         # TODO: add some actual test code here (which was probaly forgotten earlier)
         # likely it was intended to test context-rendering
 
-    def test_sparql_page(self):
+    def test05_sparql_page(self):
         url = reverse("sparqlpage")
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
@@ -110,12 +123,12 @@ class TestMainApp1(TestCase):
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
 
-    def test_reload_via_url(self):
+    def test06_reload_via_url(self):
         url = reverse("reload")
         res = self.client.get(url)
         self.assertEquals(res.status_code, 302)
 
-    def test_LanguageSpecifiedString(self):
+    def test07_LanguageSpecifiedString(self):
         t1 = models.LanguageSpecifiedString.objects.create(langtag="en", content="test1")
         t2 = models.LanguageSpecifiedString.objects.create(langtag="de", content="test1")
         res = models.LanguageSpecifiedString.objects.filter(langtag="de")
@@ -134,7 +147,7 @@ class TestMainApp1(TestCase):
         )
         self.assertGreater(len(res), 5)
 
-    def test_web_visualization1(self):
+    def test08_web_visualization1(self):
         mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         self.assertIn("ct", pyerk.ds.uri_prefix_mapping.b)
 
@@ -151,11 +164,25 @@ class TestMainApp1(TestCase):
 
         # test if labels have visualization links:
 
-        self.assertIn('<a href="/e/erk%3A%2Focse%2F0.2%23I9906/v">I9906', content)
+        # note: when hovering over the links firefox displays the unquoted version of this url
+        # i.e.: /e/erk:%2Focse%2F0.2#I9906/v
+        txt = '<a href="/e/erk%253A%252Focse%252F0.2%2523I9906/v">I9906'
+        self.assertIn(txt, content)
 
-        url2 = q_reverse("entityvisualization", uri=u("ct__I9906"))
+        url_vis = reverse("entityvisualization", kwargs={"uri": urlquote(u("ct__I9906"))})
+        url_vis_empirical = "/e/erk%253A%252Focse%252F0.2%2523I9906/v"
+        self.assertIn(url_vis_empirical, content)
 
-        self.assertIn(url2, content)
+        assert url_vis.endswith("/v")
+
+        # the following is necessary due to the temporary replace-hack views.entity_view, see bookmark://vis01
+
+        # noinspection PyUnresolvedReferences
+        url_vis2 = urllib.parse.unquote(url_vis)
+        url_vis3 = urllib.parse.unquote(url_vis2)
+        url_vis_empirical2 = urllib.parse.unquote(url_vis_empirical)
+        url_vis_empirical3 = urllib.parse.unquote(url_vis_empirical2)
+        self.assertEqual(url_vis_empirical3, url_vis3)
 
         # test label formating
 
@@ -163,7 +190,7 @@ class TestMainApp1(TestCase):
         svg_tag = soup.findAll("svg")[0]
 
         # TODO: make this independet of changing data
-        link1, link2 = svg_tag.findAll(name="a", attrs={"href": url2})
+        link1, link2 = svg_tag.findAll(name="a", attrs={"href": url_vis_empirical})
 
         self.assertEqual(link1.parent.parent.name, "g")
         self.assertEqual(link1.parent.parent.get("class"), ["node"])

@@ -19,11 +19,8 @@ from .models import Entity
 from . import vis_integration
 
 
-# when this module is loaded (i.e. when the server starts) we also want to load the data (for convenience)
-util.reload_data()
-
-
 def home_page_view(request):
+    util.reload_data_if_necessary()
 
     context = dict(greeting_message="Hello, World!")
 
@@ -90,6 +87,7 @@ def get_item(request):
 
 
 def mockup(request):
+    util.reload_data_if_necessary()
     db_entity = get_object_or_404(Entity, uri=pyerk.u("I5"))
     rendered_entity = render_entity_inline(db_entity, idx=23, script_tag="myscript", include_description=True)
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
@@ -98,7 +96,7 @@ def mockup(request):
 
 
 def entity_view(request, uri: Optional[str] = None, vis_options: Optional[Dict] = None):
-
+    util.reload_data_if_necessary()
     # noinspection PyUnresolvedReferences
     uri = urllib.parse.unquote(uri)
 
@@ -110,10 +108,10 @@ def entity_view(request, uri: Optional[str] = None, vis_options: Optional[Dict] 
 
     rendered_vis_result = vis_integration.create_visualization(db_entity, vis_options)
 
-    # TODO: This should be done in vis_integration.create_visualization
+    # TODO: This should be done in vis_integration.create_visualization;    bookmark://vis01
     #  or better: in visualize_entity() (called from there)
     if rendered_vis_result:
-        rendered_vis_result = rendered_vis_result.replace(r"%2F", r"%252F")
+        rendered_vis_result = rendered_vis_result.replace(r"%", r"%25")
 
     context = dict(
         rendered_entity=rendered_entity,
@@ -315,13 +313,16 @@ def reload_data_redirect(request, targeturl=None):
     """
     if targeturl is None:
         targeturl = "/"
-    util.reload_data(omit_reload=False)
+    util.unload_data(strict=False)
+    util.reload_data_if_necessary(force=True)
 
     return HttpResponseRedirect(targeturl)
 
 
 # this was taken from ackrep
 class SearchSparqlView(View):
+    util.reload_data_if_necessary()
+
     def get(self, request):
         context = {}
         c = attr_dict()
@@ -346,6 +347,7 @@ class SearchSparqlView(View):
 
 
 def debug_view(request, xyz=0):
+    util.reload_data_if_necessary()
 
     z = 1
 

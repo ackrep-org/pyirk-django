@@ -4,6 +4,7 @@ from django.db.utils import OperationalError
 from django.conf import settings
 from django.db import transaction
 from django.urls import reverse
+from addict import Addict as Container
 
 import pyerk
 # noinspection PyUnresolvedReferences
@@ -14,25 +15,44 @@ from pyerk import (
 from .models import Entity, LanguageSpecifiedString as LSS
 
 
-def reload_data(omit_reload=False, speedup: bool = True) -> None:
+def reload_data_if_necessary(force: bool = False, speedup: bool = True) -> Container:
+    res = Container()
+    res.modules = reload_modules_if_necessary(force=force)
+
+    # TODO: test if db needs to be reloaded
+    res.db = load_erk_entities_to_db(speedup=speedup)
+
+    return res
+
+
+def reload_modules_if_necessary(force: bool = False) -> int:
+    count = 0
+
+    # load ocse
+    if force or pyerk.settings.OCSE_URI not in pyerk.ds.uri_prefix_mapping.a:
+        mod = pyerk.erkloader.load_mod_from_path(
+            settings.ERK_DATA_PATH, prefix="ct", modname=settings.ERK_DATA_MOD_NAME,
+        )
+        count += 1
+
+    # load ackrep entities
+    if force or pyerk.ackrep_parser.__URI__ not in pyerk.ds.uri_prefix_mapping.a:
+        pyerk.ackrep_parser.parse_ackrep(base_path=None, strict=True)
+        count += 1
+
+    return count
+
+
+def load_erk_entities_to_db(speedup: bool = True) -> int:
     """
     Load data from python-module into data base to allow simple searching
 
-    :param omit_reload: default False; flag to control whether the module should be reloaded if it was already loaded
     :param speedup:     default True; flag to determine if transaction.set_autocommit(False) should be used
                         this significantly speeds up the start of the development server but does not work well
                         with django.test.TestCase (where we switch it off)
-    :return:
+
+    :return:            number of entities loaded
     """
-
-    mod = pyerk.erkloader.load_mod_from_path(
-        settings.ERK_DATA_PATH, prefix="ct", modname=settings.ERK_DATA_MOD_NAME, omit_reload=omit_reload
-    )
-    pyerk.ackrep_parser.parse_ackrep()
-
-    if mod is None:
-        # this was an omited reload
-        return
 
     # delete all existing data (if database already exisits)
     try:
@@ -40,13 +60,18 @@ def reload_data(omit_reload=False, speedup: bool = True) -> None:
         LSS.objects.all().delete()
     except OperationalError:
         # db does not yet exist. The functions is probably called during `manage.py migrate` or similiar.
-        return
+        return 0
 
     if settings.RUNNING_TESTS:
         speedup = False
 
     # repopulate the databse with items and relations (and auxiliary objects)
     _load_entities_to_db(speedup=speedup)
+
+    n = len(Entity.objects.all())
+    n += len(LSS.objects.all())
+
+    return n
 
 
 def _load_entities_to_db(speedup: bool) -> None:
@@ -89,7 +114,6 @@ def __load_entities_to_db(speedup: bool) -> None:
         label_list.append(label)
         entity_list.append(entity)
 
-
     # print(pyerk.auxiliary.bcyan(f"time1: {time.time() - t0}"))
     Entity.objects.bulk_create(entity_list)
     LSS.objects.bulk_create(label_list)
@@ -97,12 +121,22 @@ def __load_entities_to_db(speedup: bool) -> None:
     if speedup:
         transaction.commit()
 
-
     assert len(Entity.objects.all()) == len(LSS.objects.all()), "Mismatch in Entities and corresponding Labels."
     for entity, label in zip(Entity.objects.all(), LSS.objects.all()):
         entity.label.add(label)
 
     # print(pyerk.auxiliary.bcyan(f"time2: {time.time() - t0}"))
+
+
+def unload_data(strict=False):
+
+    # unload modules
+    pyerk.unload_mod(pyerk.ackrep_parser.__URI__, strict=strict)
+    pyerk.unload_mod(pyerk.settings.OCSE_URI, strict=strict)
+
+    # unload db
+    Entity.objects.all().delete()
+    LSS.objects.all().delete()
 
 
 def create_lss(ent: pyerk.Entity, rel_key: str) -> LSS:
