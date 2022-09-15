@@ -156,6 +156,8 @@ class TestMainApp1(TestCase):
         # i.e.: /e/erk:%2Focse%2F0.2#I9906/v
         txt = '<a href="/e/erk%3A%252Focse%252F0.2%23I9906/v">I9906</a>'
         self.assertIn(txt, content)
+        if 0:
+            self.assertIn('<a href="/e/erk%253A%252Focse%252F0.2%2523I9906/v">I9906', content)
 
         url_vis = reverse("entityvisualization", kwargs={"uri": urlquote(u("ct__I9906"))})
         url_vis_empirical = "/e/erk%3A%252Focse%252F0.2%23I9906/v"
