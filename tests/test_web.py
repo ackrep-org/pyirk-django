@@ -73,12 +73,12 @@ class TestMainApp1(TestCase):
         self.assertEqual(res.status_code, 200)
         content = res.content.decode("utf8")
         self.assertIn(
-            '<span class="entity-key highlight"><a href="/e/erk%3A%2Fbuiltins%23I12">I12</a></span>', content
+            '<span class="entity-key highlight"><a href="/e/erk%253A%252Fbuiltins%2523I12">I12</a></span>', content
         )
 
         src1 = twdd(
             """
-            <span class="entity-key highlight"><a href="/e/erk%3A%2Fbuiltins%23I12">I12</a></span><!--
+            <span class="entity-key highlight"><a href="/e/erk%253A%252Fbuiltins%2523I12">I12</a></span><!--
             --><!--
             --><!--
             -->["<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>"]<!--
@@ -151,7 +151,7 @@ class TestMainApp1(TestCase):
 
         # test if labels have visualization links:
 
-        self.assertIn('<a href="/e/erk%3A%2Focse%2F0.2%23I9906/v">I9906', content)
+        self.assertIn('<a href="/e/erk%253A%252Focse%252F0.2%2523I9906/v">I9906', content)
 
         url2 = q_reverse("entityvisualization", uri=u("ct__I9906"))
 

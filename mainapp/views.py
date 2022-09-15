@@ -110,7 +110,7 @@ def entity_view(request, uri: Optional[str] = None, vis_options: Optional[Dict] 
 
     rendered_vis_result = vis_integration.create_visualization(db_entity, vis_options)
     if rendered_vis_result:
-        rendered_vis_result = rendered_vis_result.replace(r"%2F", r"%252F")
+        rendered_vis_result = rendered_vis_result.replace(r"%", r"%25")
 
     context = dict(
         rendered_entity=rendered_entity,
