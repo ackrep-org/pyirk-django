@@ -37,7 +37,7 @@ def reload_modules_if_necessary(force: bool = False) -> int:
 
     # load ackrep entities
     if force or pyerk.ackrep_parser.__URI__ not in pyerk.ds.uri_prefix_mapping.a:
-        pyerk.ackrep_parser.parse_ackrep(base_path=None, strict=True)
+        pyerk.ackrep_parser.load_ackrep_entities(base_path=None, strict=True)
         count += 1
 
     return count
