@@ -31,6 +31,7 @@ from mainapp.util import w, u, q_reverse, urlquote
 
 ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
 TEST_DATA_PATH2 = os.path.join(ERK_ROOT_DIR, "erk-data", "control-theory", "control_theory1.py")
+os.environ["UNITTEST"] = "True"
 
 
 class Test_01_Basics(TestCase):

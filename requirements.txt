@@ -5,3 +5,6 @@ ipydex
 django-bleach
 markdown
 python-markdown-math
+beautifulsoup4
+tabulate
+lxml
