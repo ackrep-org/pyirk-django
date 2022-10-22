@@ -30,7 +30,10 @@ settings.RUNNING_TESTS = True
 from mainapp.util import w, u, q_reverse, urlquote
 
 ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
-TEST_DATA_PATH2 = os.path.join(ERK_ROOT_DIR, "erk-data", "control-theory", "control_theory1.py")
+
+# TODO:
+# currently loading of ocse is hardcoded in views -> util; This should be refactored in the future (use config file)
+# TEST_DATA_PATH2 = os.path.join(ERK_ROOT_DIR, "erk-data", "ocse", "control_theory1.py")
 os.environ["UNITTEST"] = "True"
 
 
@@ -108,7 +111,9 @@ class Test_02_MainApp(TestCase):
 
     def test04_entity_detail_view2(self):
         # test displaying an entity from a loaded module
-        mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
+
+        # note: currently the ocse is already loaded in the views
+        # mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         url = reverse("entitypage", kwargs=dict(uri=w("ct__I9907")))
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
@@ -149,7 +154,7 @@ class Test_02_MainApp(TestCase):
         self.assertGreater(len(res), 5)
 
     def test08_web_visualization1(self):
-        mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
+        # mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         self.assertIn("ct", pyerk.ds.uri_prefix_mapping.b)
 
         url = reverse("entityvisualization", kwargs=dict(uri=w("ct__I9907")))

@@ -25,8 +25,12 @@ def reload_data_if_necessary(force: bool = False, speedup: bool = True) -> Conta
     return res
 
 
+# TODO: a config file should specify which modules to load
 def reload_modules_if_necessary(force: bool = False) -> int:
     count = 0
+
+    # TODO this is curently broken:
+
 
     # load ocse
     if force or pyerk.settings.OCSE_URI not in pyerk.ds.uri_prefix_mapping.a:
@@ -35,10 +39,11 @@ def reload_modules_if_necessary(force: bool = False) -> int:
         )
         count += 1
 
-    # load ackrep entities
-    if force or pyerk.ackrep_parser.__URI__ not in pyerk.ds.uri_prefix_mapping.a:
-        pyerk.ackrep_parser.load_ackrep_entities(base_path=None, strict=True)
-        count += 1
+    if 0:
+        # load ackrep entities
+        if force or pyerk.ackrep_parser.__URI__ not in pyerk.ds.uri_prefix_mapping.a:
+            pyerk.ackrep_parser.load_ackrep_entities(base_path=None, strict=True)
+            count += 1
 
     return count
 
@@ -130,9 +135,9 @@ def __load_entities_to_db(speedup: bool) -> None:
 
 def unload_data(strict=False):
 
-    # unload modules
-    pyerk.unload_mod(pyerk.ackrep_parser.__URI__, strict=strict)
-    pyerk.unload_mod(pyerk.settings.OCSE_URI, strict=strict)
+    # unload all loaded modules
+    for uri, name in pyerk.ds.modnames.items():
+        pyerk.unload_mod(uri, strict=strict)
 
     # unload db
     Entity.objects.all().delete()
