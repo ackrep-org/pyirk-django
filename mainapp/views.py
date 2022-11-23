@@ -346,6 +346,17 @@ class SearchSparqlView(View):
         return TemplateResponse(request, "mainapp/page-sparql.html", context)
 
 
+# this was taken from ackrep
+class EditorView(View):
+    util.reload_data_if_necessary()
+
+    def get(self, request):
+
+        context = {}
+
+        return TemplateResponse(request, "mainapp/page-editor.html", context)
+
+
 # /api/get_auto_complete_list
 def get_auto_complete_list(request):
     """

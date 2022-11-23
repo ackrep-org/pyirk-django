@@ -213,3 +213,9 @@ class Test_02_MainApp(TestCase):
         completion_suggestions = json.loads(res.content)["data"]
 
         self.assertGreater(len(completion_suggestions), 50)
+
+    def test10_editor_view(self):
+
+        url = reverse("show_editor")
+        res = self.client.get(url)
+        self.assertEquals(res.status_code, 200)

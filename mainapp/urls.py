@@ -7,6 +7,7 @@ urlpatterns = [
     path(r"mockup", views.mockup, name="mockuppage"),
     path(r"search/", views.get_item, name="search"),
     path(r"api/get_auto_complete_list", views.get_auto_complete_list, name="get_auto_complete_list"),
+    path(r"editor", views.EditorView.as_view(), name="show_editor"),
     path(r"reload/", views.reload_data_redirect, name="reload"),
     path("sparql/", views.SearchSparqlView.as_view(), name="sparqlpage"),
     path(r"e/<str:uri>", views.entity_view, name="entitypage"),
