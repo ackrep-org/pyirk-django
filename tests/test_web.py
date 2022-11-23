@@ -1,5 +1,6 @@
 import os
 import urllib
+import json
 
 from django.test import TransactionTestCase, TestCase
 from django.urls import reverse
@@ -203,3 +204,12 @@ class Test_02_MainApp(TestCase):
         self.assertEqual(link1.parent.parent.get("class"), ["node"])
         self.assertEqual(link1.text, "I9906")
         self.assertEqual(link2.text, '["square matrix"]')
+
+    def test09_get_auto_complete_list_api(self):
+
+        url = reverse("get_auto_complete_list")
+        res = self.client.get(url)
+
+        completion_suggestions = json.loads(res.content)["data"]
+
+        self.assertGreater(len(completion_suggestions), 50)

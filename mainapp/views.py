@@ -346,6 +346,30 @@ class SearchSparqlView(View):
         return TemplateResponse(request, "mainapp/page-sparql.html", context)
 
 
+# /api/get_auto_complete_list
+def get_auto_complete_list(request):
+    """
+    Generate a list of strings which can be used in the auto-complete function of the web editor.
+    This list consists mostly of short keys and indexed-keys and
+
+    """
+    all_entities = [*pyerk.ds.relations.values(), *pyerk.ds.items.values()]
+    completion_suggestions = []
+    for entity in all_entities:
+
+        # TODO: implement a more elegant way to exclude auxiliary items
+        if entity.short_key[1] == "a":
+            continue
+
+        completion_suggestions.append(entity.short_key)
+        completion_suggestions.append(f'{entity.short_key}["{entity.R1}"]')
+        if isinstance(entity, pyerk.Relation):
+            underscore_r1 = entity.R1.replace(" ", "_")
+            completion_suggestions.append(f"{entity.short_key}__{underscore_r1}")
+
+    return JsonResponse({"status": 200, "data": completion_suggestions})
+
+
 def debug_view(request, xyz=0):
     util.reload_data_if_necessary()
 

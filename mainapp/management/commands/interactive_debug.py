@@ -45,6 +45,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         from ipydex import IPS, activate_ips_on_exception  # noqa
         activate_ips_on_exception()
+        import pyerk as p  # noqa
         from mainapp.models import Entity  # noqa
 
         loaded_mod, prefix = options.get("load_mod") or (None, None)
