@@ -45,3 +45,23 @@ editor.setOptions({
 });
 
 langTools.setCompleters([staticWordCompleter]);
+
+editor.focus()
+
+// move cursor to last line
+var row = editor.session.getLength() - 1
+var column = editor.session.getLine(row).length // or simply Infinity
+editor.gotoLine(row + 1, column)
+
+
+
+// Redefine CTRL+S
+
+document.onkeydown = function(e) {
+    if (e.ctrlKey && e.keyCode === 83) {
+        alert('In the future this should trigger the server to save the file via api.');
+
+
+        return false;
+    }
+};
