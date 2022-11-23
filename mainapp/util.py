@@ -8,7 +8,7 @@ from addict import Addict as Container
 
 import pyerk
 # noinspection PyUnresolvedReferences
-from pyerk import (
+from pyerk import (  # noqa
     u,  # convenience function to convert a key into an URI
     auxiliary as aux,
 )
@@ -29,16 +29,16 @@ def reload_data_if_necessary(force: bool = False, speedup: bool = True) -> Conta
 def reload_modules_if_necessary(force: bool = False) -> int:
     count = 0
 
-    # TODO this is curently broken:
-
+    # TODO: this should be read from a config file
 
     # load ocse
     if force or pyerk.settings.OCSE_URI not in pyerk.ds.uri_prefix_mapping.a:
-        mod = pyerk.erkloader.load_mod_from_path(
+        _ = pyerk.erkloader.load_mod_from_path(
             settings.ERK_DATA_PATH, prefix="ct", modname=settings.ERK_DATA_MOD_NAME,
         )
         count += 1
 
+    # TODO: remove this obsolete code
     if 0:
         # load ackrep entities
         if force or pyerk.ackrep_parser.__URI__ not in pyerk.ds.uri_prefix_mapping.a:
@@ -95,21 +95,16 @@ def _load_entities_to_db(speedup: bool) -> None:
             transaction.commit()
     finally:
         if speedup:
-            from ipydex import IPS, activate_ips_on_exception
-
             transaction.set_autocommit(True)
 
 
 def __load_entities_to_db(speedup: bool) -> None:
     """
 
-    :param speedup:     default True; determine if db-commits are switched to "manual mode" to leverate bullk operations
+    :param speedup:   default True; determine if db-commits are switched to "manual mode" to leverage bulk operations
     :return:
     """
 
-    import time
-
-    t0 = time.time()
     entity_list = []
     label_list = []
     for ent in itertools.chain(pyerk.ds.items.values(), pyerk.ds.relations.values()):
