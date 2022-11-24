@@ -27,8 +27,6 @@ async function save_file(){
     const source = await fetch(url, post_package);
     const res = await source.json();
 
-    console.log("file not yet saved");
-    console.log("post_package:", post_package);
     console.log("data:", res.data);
 
     return res.data
@@ -83,9 +81,16 @@ editor.gotoLine(row + 1, column)
 
 document.onkeydown = function(e) {
     if (e.ctrlKey && e.keyCode === 83) {
-        alert('In the future this should trigger the server to save the file via api.');
+        //alert('In the future this should trigger the server to save the file via api.');
 
-
-        return false;
-    }
+        (async () => {
+            try {
+                await save_file();
+                console.log("api call (save_file) successful");
+            } catch (e) {
+                console.log("api call not successful");
+            }
+        })();
+        e.preventDefault();
+    } // end of `if`
 };

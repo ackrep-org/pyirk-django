@@ -373,7 +373,11 @@ class ApiSaveFile(View):
 
     def get(self, request):
 
-        context = attr_dict(msg="this url only handles post requests")
+        context = attr_dict()
+        if request.GET.get("success", None):
+            context.msg = "file saved"
+        else:
+            context.msg = "something went wrong during saving"
 
         return JsonResponse({"status": 200, "data": context})
 
@@ -385,7 +389,7 @@ class ApiSaveFile(View):
 
         util.savetxt(fpath, file_content, backup=True)
 
-        return HttpResponseRedirect(request.path)
+        return HttpResponseRedirect(f"{request.path}?success=True")
 
 
 # /api/get_auto_complete_list
