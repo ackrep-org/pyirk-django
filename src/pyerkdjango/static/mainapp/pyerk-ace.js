@@ -12,9 +12,24 @@ async function get_auto_complete_list(){
 
 async function save_file(){
     const url = "/api/save_file";
-    const source = await fetch(url);
-    //const res = await source.json();
-    console.log("file not yet saved")
+    const editor_content = editor.getValue();
+    const fpath = JSON.parse(document.getElementById('fpath').textContent);
+
+
+    let data = {editor_content: editor_content, fpath: fpath};
+    let post_package = {
+        method: "POST",
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    };
+
+
+    const source = await fetch(url, post_package);
+    const res = await source.json();
+
+    console.log("file not yet saved");
+    console.log("post_package:", post_package);
+    console.log("data:", res.data);
 
     return res.data
 }

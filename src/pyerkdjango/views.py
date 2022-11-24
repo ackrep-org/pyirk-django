@@ -1,6 +1,7 @@
 import os
 from typing import Union, Optional, Dict, Tuple
 import urllib
+import json
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
@@ -372,9 +373,19 @@ class ApiSaveFile(View):
 
     def get(self, request):
 
-        c = context = attr_dict()
+        context = attr_dict(msg="this url only handles post requests")
 
         return JsonResponse({"status": 200, "data": context})
+
+    def post(self, request):
+
+        post_data = json.loads(request.body)
+        file_content = post_data.get("editor_content")
+        fpath = post_data.get("fpath")
+
+        util.savetxt(fpath, file_content, backup=True)
+
+        return HttpResponseRedirect(request.path)
 
 
 # /api/get_auto_complete_list

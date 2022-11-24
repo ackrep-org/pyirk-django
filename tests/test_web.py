@@ -1,8 +1,9 @@
 import os
 import urllib
 import json
-
+import shutil
 from bs4 import BeautifulSoup
+import unittest
 from django.test import TransactionTestCase, TestCase  # noqa
 from django.urls import reverse
 from django.db.models import Q
@@ -231,3 +232,37 @@ class Test_02_MainApp(TestCase):
         url = reverse("save_file")
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
+
+
+class Test_03_Utils(unittest.TestCase):
+
+    fpath = "_test.txt"
+    backup_dir = "_backup"
+
+    def tearDown(self):
+
+        try:
+            shutil.rmtree(self.backup_dir)
+        except OSError:
+            pass
+
+        try:
+            os.remove(self.fpath)
+        except OSError:
+            pass
+
+    def test_savetxt(self):
+        test_content = "#abcedfg123"
+
+        self.assertFalse(os.path.exists(self.fpath))
+
+        pyerkdjango.util.savetxt(self.fpath, test_content, backup=False)
+        self.assertTrue(os.path.exists(self.fpath))
+
+        # test backup
+        self.assertFalse(os.path.exists(self.backup_dir))
+        pyerkdjango.util.savetxt(self.fpath, test_content, backup=True)
+        self.assertTrue(os.path.exists(self.backup_dir))
+
+        dir_content = os.listdir(self.backup_dir)
+        self.assertEqual(len(dir_content), 1)

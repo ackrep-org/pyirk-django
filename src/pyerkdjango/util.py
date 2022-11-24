@@ -1,5 +1,8 @@
+import time
+import os
 import itertools
 import urllib
+import shutil
 from django.db.utils import OperationalError
 from django.conf import settings
 from django.db import transaction
@@ -169,7 +172,39 @@ def w(key_str: str) -> str:
     return urlquote(res)
 
 
-# TODO: obsolete
+def mkdir_p(path):
+    """
+    create a path and accept if it already exists
+    """
+    try:
+        os.makedirs(path)
+    except OSError:
+        pass
+
+
+def savetxt(fpath: str, file_content: str, backup=True) -> None:
+
+    if not os.path.exists(fpath):
+        backup = False
+
+    parent_path, fname = os.path.split(fpath)
+
+    if backup:
+
+        backup_dir = os.path.join(parent_path, "_backup")
+
+        tstamp = time.strftime("%Y-%m-%d__%H-%M-%S")
+        root_name, ext = os.path.splitext(fname)
+        backup_path = os.path.join(backup_dir, f"{root_name}_{tstamp}{ext}")
+
+        mkdir_p(backup_dir)
+        shutil.copy(fpath, backup_path)
+
+    with open(fpath, "w") as fp:
+        fp.write(file_content)
+
+
+# TODO: obsolete?
 def q_reverse(pagename, uri, **kwargs):
     """
     Simplifies the hazzle for passing URIs into `reverse` (they must be percent-encoded therefor, aka quoted), and then

@@ -22,6 +22,10 @@
 </div>
 {% endif %}
 
+{# store the file path such that it is available for js#}
+{{ fpath|json_script:"fpath" }}
+
+
 <div class="small-grey">
 uri: <span class="literal">{{ uri }}</span>; path: <span class="literal">{{ fpath }}</span>
 &nbsp;<a onclick="save_file()" href="javascript:void(0);" title="CTRL+S">save file</a>
