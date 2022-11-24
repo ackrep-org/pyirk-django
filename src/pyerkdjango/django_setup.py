@@ -1,5 +1,4 @@
 import os
-import sys
 import django
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -20,7 +19,6 @@ if not apps.apps_ready:
 
 if not settings_configured_flag:
 
-    # os.environ["DJANGO_SETTINGS_MODULE"] = "ackrep_core_django_settings.settings"
     os.environ["DJANGO_SETTINGS_MODULE"] = "pyerkdjango.django_project.settings"
     django.setup()
 else:

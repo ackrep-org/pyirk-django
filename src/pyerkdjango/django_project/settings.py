@@ -13,6 +13,13 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+try:
+    # this will be part of standard library for python >= 3.11
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -201,6 +208,27 @@ ERK_ROOT_DIR = get_erk_root_dir()
 # Flag to determine if tests are running
 RUNNING_TESTS = False
 
-# TODO: This should be read from a config file
-ERK_DATA_PATH = os.path.join(ERK_ROOT_DIR, "erk-data", "ocse", "control_theory1.py")
-ERK_DATA_MOD_NAME = "control_theory1"
+
+configfilename = "pyerkconf.toml"
+
+try:
+    with open(configfilename, "rb") as fp:
+        conf = tomllib.load(fp).get("pyerkdjango")
+except FileNotFoundError:
+    conf = {}
+
+if main_mod := conf.get("main_module"):
+    ERK_DATA_MOD_NAME = main_mod.rstrip(".py")
+    abs_cwd = os.path.abspath(os.getcwd())
+    ERK_DATA_PATH = os.path.join(abs_cwd, main_mod)
+
+    if not os.path.exists(ERK_DATA_PATH):
+        msg = (
+            f"Could not find main module `{main_mod}¸ as specified in `{configfilename}`. Full path: {ERK_DATA_PATH}"
+        )
+        raise FileNotFoundError(msg)
+
+else:
+    # Fall back to hard coded data
+    ERK_DATA_PATH = os.path.join(ERK_ROOT_DIR, "erk-data", "ocse", "control_theory1.py")
+    ERK_DATA_MOD_NAME = "control_theory1"
