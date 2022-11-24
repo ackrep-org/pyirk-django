@@ -24,11 +24,17 @@
 
 
 
+{% if fcontent %}
+<pre id="editor">
+{{ fcontent }}
+</pre>
+{% else %}
 <pre id="editor">
 # Type your pyerk code here.
 # Use CTRL+Space to trigger auto completion.
-
 </pre>
+{% endif %}
+
 
 {% endblock  %}
 

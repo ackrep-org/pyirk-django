@@ -221,6 +221,7 @@ if main_mod := conf.get("main_module"):
     ERK_DATA_MOD_NAME = main_mod.rstrip(".py")
     abs_cwd = os.path.abspath(os.getcwd())
     ERK_DATA_PATH = os.path.join(abs_cwd, main_mod)
+    ERK_DATA_DIR = abs_cwd
 
     if not os.path.exists(ERK_DATA_PATH):
         msg = (
@@ -230,5 +231,6 @@ if main_mod := conf.get("main_module"):
 
 else:
     # Fall back to hard coded data
-    ERK_DATA_PATH = os.path.join(ERK_ROOT_DIR, "erk-data", "ocse", "control_theory1.py")
+    ERK_DATA_DIR = os.path.join(ERK_ROOT_DIR, "erk-data", "ocse")
+    ERK_DATA_PATH = os.path.join(ERK_DATA_DIR, "control_theory1.py")
     ERK_DATA_MOD_NAME = "control_theory1"

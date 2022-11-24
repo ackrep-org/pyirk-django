@@ -1,5 +1,7 @@
+import os
 from typing import Union, Optional, Dict, Tuple
 import urllib
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect, JsonResponse
 from django.template.response import TemplateResponse
@@ -346,13 +348,21 @@ class SearchSparqlView(View):
         return TemplateResponse(request, "mainapp/page-sparql.html", context)
 
 
-# this was taken from ackrep
 class EditorView(View):
-    util.reload_data_if_necessary()
 
     def get(self, request):
 
-        context = {}
+        c = context = attr_dict()
+        default_fname = f"{settings.ERK_DATA_MOD_NAME}.py"
+        fname = request.GET.get("fname", default_fname)
+        fpath = os.path.join(settings.ERK_DATA_DIR, fname)
+
+        try:
+            with open(fpath, "r") as fp:
+                c.fcontent = fp.read()
+        except FileNotFoundError as ex:
+            c.err = str(ex)
+            pass
 
         return TemplateResponse(request, "mainapp/page-editor.html", context)
 
