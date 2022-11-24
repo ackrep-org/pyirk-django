@@ -355,16 +355,26 @@ class EditorView(View):
         c = context = attr_dict()
         default_fname = f"{settings.ERK_DATA_MOD_NAME}.py"
         fname = request.GET.get("fname", default_fname)
-        fpath = os.path.join(settings.ERK_DATA_DIR, fname)
+        c.fpath = os.path.join(settings.ERK_DATA_DIR, fname)
 
         try:
-            with open(fpath, "r") as fp:
+            with open(c.fpath, "r") as fp:
                 c.fcontent = fp.read()
+            c.uri = "testuri"
         except FileNotFoundError as ex:
             c.err = str(ex)
             pass
 
         return TemplateResponse(request, "mainapp/page-editor.html", context)
+
+
+class ApiSaveFile(View):
+
+    def get(self, request):
+
+        c = context = attr_dict()
+
+        return JsonResponse({"status": 200, "data": context})
 
 
 # /api/get_auto_complete_list

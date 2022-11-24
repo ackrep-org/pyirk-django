@@ -10,6 +10,15 @@ async function get_auto_complete_list(){
     return res.data
 }
 
+async function save_file(){
+    const url = "/api/save_file";
+    const source = await fetch(url);
+    //const res = await source.json();
+    console.log("file not yet saved")
+
+    return res.data
+}
+
 // create empty list as fallback
 var auto_complete_list = [];
 

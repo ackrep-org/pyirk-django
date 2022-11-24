@@ -225,3 +225,9 @@ class Test_02_MainApp(TestCase):
         url = reverse("show_editor")
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
+
+    def test11_api_save_file(self):
+
+        url = reverse("save_file")
+        res = self.client.get(url)
+        self.assertEquals(res.status_code, 200)

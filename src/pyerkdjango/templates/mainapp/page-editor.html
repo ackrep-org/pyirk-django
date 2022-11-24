@@ -14,7 +14,7 @@
 {% endblock %}
 {% block content %}
 
-<h3>Edit Pyerk Module (with Autocompletion)</h3>
+<h3 class="editor-heading">Edit Pyerk Module (with Autocompletion)</h3>
 
 {% if err %}
 <div class="errorbox">
@@ -22,6 +22,23 @@
 </div>
 {% endif %}
 
+<div class="small-grey">
+uri: <span class="literal">{{ uri }}</span>; path: <span class="literal">{{ fpath }}</span>
+&nbsp;<a onclick="save_file()" href="javascript:void(0);" title="CTRL+S">save file</a>
+&nbsp;<details style="display: inline;">
+<summary>
+Load file ...
+</summary>
+<ul>
+    <li>
+        <a href="#">test1</a>
+    </li>
+    <li>
+        <a href="#">test2</a>
+    </li>
+</ul>
+</details>
+</div>
 
 
 {% if fcontent %}
