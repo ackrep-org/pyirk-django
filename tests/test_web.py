@@ -2,6 +2,7 @@ import os
 import urllib
 import json
 
+from bs4 import BeautifulSoup
 from django.test import TransactionTestCase, TestCase
 from django.urls import reverse
 from django.db.models import Q
@@ -9,26 +10,26 @@ from textwrap import dedent as twdd
 # noinspection PyUnresolvedReferences
 from ipydex import IPS
 from django.conf import settings
+# this is relevant for switching off some database optimizations which are incompatible with django.test.TestCase
+# because every testcase rewinds its transactions
+settings.RUNNING_TESTS = True
 
-from bs4 import BeautifulSoup
 
 # noinspection PyUnresolvedReferences
-import mainapp.util
+import pyerkdjango.util
 import pyerk
 
 # noinspection PyUnresolvedReferences
-from mainapp import models
+from pyerkdjango import models
 
 # The tests can be run with
 # `python manage.py test`
 # `python manage.py test --rednose` # with colors
 
-# this is relevant for switching of some database optimizations which are incompatible with django.test.TestCase
-# because every testcase rewinds its transactions
-settings.RUNNING_TESTS = True
+
 
 # noinspection PyUnresolvedReferences
-from mainapp.util import w, u, q_reverse, urlquote
+from pyerkdjango.util import w, u, q_reverse, urlquote
 
 ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
 
@@ -54,9 +55,9 @@ class Test_01_Basics(TestCase):
 
 class Test_02_MainApp(TestCase):
     def setUp(self):
-        print("In method", mainapp.util.aux.bgreen(self._testMethodName))
+        print("In method", pyerkdjango.util.aux.bgreen(self._testMethodName))
         # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
-        mainapp.util.reload_data_if_necessary(speedup=False)
+        pyerkdjango.util.reload_data_if_necessary(speedup=False)
 
     def test01_home_page1(self):
 
