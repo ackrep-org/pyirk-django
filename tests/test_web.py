@@ -3,12 +3,12 @@ import urllib
 import json
 
 from bs4 import BeautifulSoup
-from django.test import TransactionTestCase, TestCase
+from django.test import TransactionTestCase, TestCase  # noqa
 from django.urls import reverse
 from django.db.models import Q
 from textwrap import dedent as twdd
 # noinspection PyUnresolvedReferences
-from ipydex import IPS
+from ipydex import IPS  # noqa
 from django.conf import settings
 # this is relevant for switching off some database optimizations which are incompatible with django.test.TestCase
 # because every testcase rewinds its transactions
@@ -16,20 +16,19 @@ settings.RUNNING_TESTS = True
 
 
 # noinspection PyUnresolvedReferences
-import pyerkdjango.util
-import pyerk
+import pyerkdjango.util  # noqa
+import pyerk  # noqa
 
 # noinspection PyUnresolvedReferences
-from pyerkdjango import models
+from pyerkdjango import models  # noqa
 
 # The tests can be run with
 # `python manage.py test`
 # `python manage.py test --rednose` # with colors
 
 
-
 # noinspection PyUnresolvedReferences
-from pyerkdjango.util import w, u, q_reverse, urlquote
+from pyerkdjango.util import w, u, q_reverse, urlquote  # noqa
 
 ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
 
@@ -43,14 +42,17 @@ class Test_01_Basics(TestCase):
     """
     Ensure that the testmodule itself works as expected
     """
+
     def test01_home_page(self):
         url = reverse("landingpage")
         res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
 
     def test02_home_page(self):
         # load the landing page again to see if tests interact (not wantend)
         url = reverse("landingpage")
         res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
 
 
 class Test_02_MainApp(TestCase):
@@ -127,7 +129,10 @@ class Test_02_MainApp(TestCase):
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
 
-        url = "/sparql/?query=%0D%0APREFIX+%3A+%3Cerk%3A%2F%3E%0D%0ASELECT+*%0D%0AWHERE+%7B%0D%0A++++%3Fs+%3AR5+%3Fo.%0D%0A%7D%0D%0A"
+        url = (
+            "/sparql/?query=%0D%0APREFIX+%3A+%3Cerk%3A%2F%3E%0D%0ASELECT+*%0D%0AWHERE"
+            "+%7B%0D%0A++++%3Fs+%3AR5+%3Fo.%0D%0A%7D%0D%0A"
+        )
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
 
@@ -137,7 +142,7 @@ class Test_02_MainApp(TestCase):
         self.assertEquals(res.status_code, 302)
 
     def test07_LanguageSpecifiedString(self):
-        t1 = models.LanguageSpecifiedString.objects.create(langtag="en", content="test1")
+        _ = models.LanguageSpecifiedString.objects.create(langtag="en", content="test1")
         t2 = models.LanguageSpecifiedString.objects.create(langtag="de", content="test1")
         res = models.LanguageSpecifiedString.objects.filter(langtag="de")
         self.assertGreaterEqual(len(res), 1)
@@ -147,7 +152,7 @@ class Test_02_MainApp(TestCase):
         res = x.label.filter(langtag="en")
         self.assertGreaterEqual(len(res), 1)
 
-        labels = x.label.all()
+        _ = x.label.all()
 
         q = "sta"
         res = models.Entity.objects.filter(
