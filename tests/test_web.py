@@ -180,14 +180,14 @@ class Test_02_MainApp(TestCase):
 
         # note: when hovering over the links firefox displays the unquoted version of this url
         # i.e.: /e/erk:%2Focse%2F0.2#I9906/v
-        txt = '<a href="/e/erk%253A%252Fmath%252F0.2%2523I9906/v">I9906'
+
+        item_url = "/e/erk%253A%252Focse%252F0.2%252Fmath%2523I9906/v"
+
+        txt = f'<a href="{item_url}">I9906'
 
         self.assertIn(txt, content)
 
         url_vis = reverse("entityvisualization", kwargs={"uri": urlquote(u("ma__I9906"))})
-        url_vis_empirical = "/e/erk%253A%252Fmath%252F0.2%2523I9906/v"
-        self.assertIn(url_vis_empirical, content)
-
         assert url_vis.endswith("/v")
 
         # the following is necessary due to the temporary replace-hack views.entity_view, see bookmark://vis01
@@ -195,7 +195,7 @@ class Test_02_MainApp(TestCase):
         # noinspection PyUnresolvedReferences
         url_vis2 = urllib.parse.unquote(url_vis)
         url_vis3 = urllib.parse.unquote(url_vis2)
-        url_vis_empirical2 = urllib.parse.unquote(url_vis_empirical)
+        url_vis_empirical2 = urllib.parse.unquote(item_url)
         url_vis_empirical3 = urllib.parse.unquote(url_vis_empirical2)
         self.assertEqual(url_vis_empirical3, url_vis3)
 
@@ -205,7 +205,7 @@ class Test_02_MainApp(TestCase):
         svg_tag = soup.findAll("svg")[0]
 
         # TODO: make this independet of changing data
-        link1, link2 = svg_tag.findAll(name="a", attrs={"href": url_vis_empirical})
+        link1, link2 = svg_tag.findAll(name="a", attrs={"href": item_url})
 
         self.assertEqual(link1.parent.parent.name, "g")
         self.assertEqual(link1.parent.parent.get("class"), ["node"])
