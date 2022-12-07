@@ -25,7 +25,9 @@ from . import vis_integration
 def home_page_view(request):
     util.reload_data_if_necessary()
 
-    context = dict(greeting_message="Hello, World!")
+    # this is a list of tuples like `[('erk:/ocse/0.2/math',  '/path/to/erk-data/ocse/math1.py'), ...],
+    mods = list(pyerk.ds.mod_path_mapping.a.items())
+    context = dict(loaded_pyerk_mods=mods)
 
     return render(request, "mainapp/page-landing.html", context)
 
@@ -351,7 +353,9 @@ class SearchSparqlView(View):
 
 class EditorView(View):
 
-    def get(self, request):
+    def get(self, request, uri=None):
+
+        print(uri)
 
         c = context = attr_dict()
         default_fname = f"{settings.ERK_DATA_MOD_NAME}.py"

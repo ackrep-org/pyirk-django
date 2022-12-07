@@ -9,6 +9,7 @@ urlpatterns = [
     path(r"api/get_auto_complete_list", views.get_auto_complete_list, name="get_auto_complete_list"),
     path(r"api/save_file", views.ApiSaveFile.as_view(), name="save_file"),
     path(r"editor", views.EditorView.as_view(), name="show_editor"),
+    re_path(r"^editor/(?P<uri>.*)$", views.EditorView.as_view(), name="show_editor_with_uri"),
     path(r"reload/", views.reload_data_redirect, name="reload"),
     path("sparql/", views.SearchSparqlView.as_view(), name="sparqlpage"),
     path(r"e/<str:uri>", views.entity_view, name="entitypage"),
