@@ -28,6 +28,9 @@ def setup_django():
 
 def start_django(*args, **kwargs):
     print("starting django")
-    # exit()
-
     management.call_command("runserver", *args, **kwargs)
+
+
+def start_django_shell(*args, **kwargs):
+    print("starting django shell")
+    management.call_command("shell", *args, **kwargs)
