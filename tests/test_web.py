@@ -49,7 +49,36 @@ from pyerkdjango.util import w, u, q_reverse, urlquote  # noqa
 os.environ["UNITTEST"] = "True"
 
 
-class Test_01_Basics(TestCase):
+# this serves to print the test-method-name before it is executed (useful for debugging, see setUP below)
+PRINT_TEST_METHODNAMES = True
+
+
+class HouskeeperMixin:
+    """
+    Class to provide common functions for all our TestCase subclasses
+    """
+
+    def setUp(self):
+        self.print_methodnames()
+
+        if method := getattr(self, "custom_setUp", None):
+            assert callable(method)
+            method()
+
+    def tearDown(self) -> None:
+        if method := getattr(self, "custom_tearDown", None):
+            assert callable(method)
+            method()
+
+    def print_methodnames(self):
+        if PRINT_TEST_METHODNAMES:
+            # noinspection PyUnresolvedReferences
+            cls = self.__class__
+            method_repr = f"{cls.__module__}.{cls.__qualname__}.{self._testMethodName}"
+            print("In method", pyerkdjango.util.aux.bgreen(method_repr))
+
+
+class Test_01_Basics(HouskeeperMixin, TestCase):
     """
     Ensure that the testmodule itself works as expected
     """
@@ -85,9 +114,8 @@ class Test_01_Basics(TestCase):
         self.assertIn("utc_loaded_module:erk:/ocse/0.2/control_theory", content)
 
 
-class Test_02_MainApp(TestCase):
-    def setUp(self):
-        print("In method", pyerkdjango.util.aux.bgreen(self._testMethodName))
+class Test_02_MainApp(HouskeeperMixin, TestCase):
+    def custom_setUp(self):
         # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
         pyerkdjango.util.reload_data_if_necessary(speedup=False)
 
@@ -263,12 +291,12 @@ class Test_02_MainApp(TestCase):
         self.assertEquals(res.status_code, 200)
 
 
-class Test_03_Utils(unittest.TestCase):
+class Test_03_Utils(HouskeeperMixin, unittest.TestCase):
 
     fpath = "_test.txt"
     backup_dir = "_backup"
 
-    def tearDown(self):
+    def custom_tearDown(self):
 
         try:
             shutil.rmtree(self.backup_dir)
