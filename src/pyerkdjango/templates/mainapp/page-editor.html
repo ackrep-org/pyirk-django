@@ -14,10 +14,13 @@
 {% endblock %}
 {% block content %}
 
+<!-- utc_editor_page -->
+
 <h3 class="editor-heading">Edit Pyerk Module (with Autocompletion)</h3>
 
 {% if err %}
 <div class="errorbox">
+<!-- utc_error -->
     {{ err }}
 </div>
 {% endif %}
@@ -27,6 +30,7 @@
 
 
 <div class="small-grey">
+<!-- utc_uri_of_loaded_file:{{ uri }} -->
 uri: <span class="literal">{{ uri }}</span>; path: <span class="literal">{{ fpath }}</span>
 &nbsp;<a onclick="save_file()" href="javascript:void(0);" title="CTRL+S">save file</a>
 &nbsp;<details style="display: inline;">

@@ -1,0 +1,19 @@
+{% extends "mainapp/base.html" %}
+{% load static %}
+{% load bleach_tags %}
+
+{% block title %}erk: emergent representation of knowledge – error{% endblock %}
+
+
+{% block content %}
+<!-- utc_error_page -->
+
+<div class="errorbox">
+{% if err %}
+    {{ err }}
+{% else %}
+An error occurred but no error message was provided.
+{% endif %}
+</div>
+
+{% endblock %}

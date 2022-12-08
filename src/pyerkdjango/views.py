@@ -355,20 +355,25 @@ class EditorView(View):
 
     def get(self, request, uri=None):
 
-        print(uri)
-
         c = context = attr_dict()
-        default_fname = f"{settings.ERK_DATA_MOD_NAME}.py"
-        fname = request.GET.get("fname", default_fname)
-        c.fpath = os.path.join(settings.ERK_DATA_DIR, fname)
+        if uri is None:
+            uri2 = pyerk.ds.mod_path_mapping.b.get(settings.LC.ERK_DATA_MAIN_MOD)
+        else:
+            uri2 = urllib.parse.unquote(uri)
+
+        c.fpath = pyerk.ds.mod_path_mapping.a.get(uri2)
+
+        if not c.fpath:
+            c.err = f"Invalid uri: `{uri2}` (parsed from uri-argument: `{uri}`)"
+            return TemplateResponse(request, "mainapp/page-error.html", context)
 
         try:
             with open(c.fpath, "r") as fp:
                 c.fcontent = fp.read()
-            c.uri = "testuri"
+            c.uri = uri2
         except FileNotFoundError as ex:
             c.err = str(ex)
-            pass
+            return TemplateResponse(request, "mainapp/page-error.html", context)
 
         return TemplateResponse(request, "mainapp/page-editor.html", context)
 
@@ -421,9 +426,6 @@ def get_auto_complete_list(request):
 
 
 def debug_view(request, xyz=0):
-    util.reload_data_if_necessary()
-
-    z = 1
 
     if xyz == 1:
         # start interactive shell for debugging (helpful if called from the unittests)
@@ -431,8 +433,6 @@ def debug_view(request, xyz=0):
 
     elif xyz == 2:
         return HttpResponseServerError("Errormessage")
-
-    import os
 
     txt = f"""
     {os.getcwd()}

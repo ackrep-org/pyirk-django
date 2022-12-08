@@ -41,12 +41,11 @@ from pyerkdjango import models  # noqa
 # noinspection PyUnresolvedReferences
 from pyerkdjango.util import w, u, q_reverse, urlquote  # noqa
 
-# ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
 
-# TODO:
-# currently loading of ocse is hardcoded in views -> util; This should be refactored in the future (use config file)
-# TEST_DATA_PATH2 = os.path.join(ERK_ROOT_DIR, "erk-data", "ocse", "control_theory1.py")
 os.environ["UNITTEST"] = "True"
+
+MATH_URI = "erk:/ocse/0.2/math"
+CT_URI = "erk:/ocse/0.2/control_theory"
 
 
 # this serves to print the test-method-name before it is executed (useful for debugging, see setUP below)
@@ -74,7 +73,7 @@ class HouskeeperMixin:
         if PRINT_TEST_METHODNAMES:
             # noinspection PyUnresolvedReferences
             cls = self.__class__
-            method_repr = f"{cls.__module__}.{cls.__qualname__}.{self._testMethodName}"
+            method_repr = f"{cls.__module__}:{cls.__qualname__}.{self._testMethodName}"
             print("In method", pyerkdjango.util.aux.bgreen(method_repr))
 
 
@@ -102,16 +101,18 @@ class Test_01_Basics(HouskeeperMixin, TestCase):
         res = self.client.get(url)
         content = res.content.decode("utf8")
         self.assertEqual(res.status_code, 200)
-        self.assertNotIn("utc_loaded_module:erk:/ocse/0.2/math", content)
-        self.assertNotIn("utc_loaded_module:erk:/ocse/0.2/control_theory", content)
+        self.assertNotIn(f"utc_loaded_module:{MATH_URI}", content)
+        self.assertNotIn(f"utc_loaded_module:{CT_URI}", content)
 
         # now load the data
+        self.assertEqual(len(pyerk.ds.mod_path_mapping.a), 0)
         pyerkdjango.util.reload_data_if_necessary(speedup=False)
+        self.assertNotEqual(len(pyerk.ds.mod_path_mapping.a), 0)
 
         res = self.client.get(url)
         content = res.content.decode("utf8")
-        self.assertIn("utc_loaded_module:erk:/ocse/0.2/math", content)
-        self.assertIn("utc_loaded_module:erk:/ocse/0.2/control_theory", content)
+        self.assertIn(f"utc_loaded_module:{MATH_URI}", content)
+        self.assertIn(f"utc_loaded_module:{CT_URI}", content)
 
 
 class Test_02_MainApp(HouskeeperMixin, TestCase):
@@ -283,6 +284,23 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         url = reverse("show_editor")
         res = self.client.get(url)
         self.assertEquals(res.status_code, 200)
+        content = res.content.decode("utf8")
+        self.assertNotIn("utc_error", content)
+        self.assertIn("utc_editor_page", content)
+
+        uri = MATH_URI
+        url = reverse("show_editor_with_uri", kwargs=dict(uri=uri))
+        res = self.client.get(url)
+        self.assertEquals(res.status_code, 200)
+        content = res.content.decode("utf8")
+        self.assertNotIn("utc_error", content)
+        self.assertIn(f"utc_uri_of_loaded_file:{uri}", content)
+
+        uri = "wrong:/bad-uri"
+        url = reverse("show_editor_with_uri", kwargs=dict(uri=uri))
+        res = self.client.get(url)
+        content = res.content.decode("utf8")
+        self.assertIn("utc_error_page", content)
 
     def test11_api_save_file(self):
 
