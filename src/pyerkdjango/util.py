@@ -36,8 +36,9 @@ def reload_modules_if_necessary(force: bool = False) -> int:
 
     # load ocse
     if force or pyerk.settings.OCSE_URI not in pyerk.ds.uri_prefix_mapping.a:
+        LC = settings.LC
         _ = pyerk.erkloader.load_mod_from_path(
-            settings.ERK_DATA_PATH, prefix="ct", modname=settings.ERK_DATA_MOD_NAME,
+            LC.ERK_DATA_MAIN_MOD, prefix=LC.ERK_DATA_MAIN_MOD_PREFIX, modname=LC.ERK_DATA_MAIN_MOD_NAME,
         )
         count += 1
 

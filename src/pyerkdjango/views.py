@@ -23,7 +23,7 @@ from . import vis_integration
 
 
 def home_page_view(request):
-    util.reload_data_if_necessary()
+    # util.reload_data_if_necessary()
 
     # this is a list of tuples like `[('erk:/ocse/0.2/math',  '/path/to/erk-data/ocse/math1.py'), ...],
     mods = list(pyerk.ds.mod_path_mapping.a.items())
@@ -326,7 +326,7 @@ def reload_data_redirect(request, targeturl=None):
 
 # this was taken from ackrep
 class SearchSparqlView(View):
-    util.reload_data_if_necessary()
+    # util.reload_data_if_necessary()
 
     def get(self, request):
         context = {}

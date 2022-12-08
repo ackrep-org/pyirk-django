@@ -197,40 +197,48 @@ BLEACH_ALLOWED_ATTRIBUTES = allow_attributes
 BLEACH_STRIP_TAGS = False
 BLEACH_STRIP_COMMENTS = False
 
-# noinspection PyUnresolvedReferences
-from pyerk.settings import DEFAULT_DATA_LANGUAGE
-
-from pyerk.auxiliary import get_erk_root_dir
-
-ERK_ROOT_DIR = get_erk_root_dir()
-
-
 # Flag to determine if tests are running
 RUNNING_TESTS = False
 
 
-configfilename = "pyerkconf.toml"
+class LazyContainer:
+    """
+    some variables should be easily available as attribute of settings, however they depend on pyerk
+    and during unittesting that module can only be loaded after os.environ["PYERK_BASE_DIR"] has been set.
+    This class provides a workarround mechanism.
+    """
 
-try:
-    with open(configfilename, "rb") as fp:
-        conf = tomllib.load(fp).get("pyerkdjango")
-except FileNotFoundError:
-    conf = {}
+    def __init__(self):
+        self.store = {"initialized": False}
 
-if main_mod := conf.get("main_module"):
-    ERK_DATA_MOD_NAME = main_mod.rstrip(".py")
-    abs_cwd = os.path.abspath(os.getcwd())
-    ERK_DATA_PATH = os.path.join(abs_cwd, main_mod)
-    ERK_DATA_DIR = abs_cwd
+    def __getattr__(self, attrname: str):
 
-    if not os.path.exists(ERK_DATA_PATH):
-        msg = (
-            f"Could not find main module `{main_mod}¸ as specified in `{configfilename}`. Full path: {ERK_DATA_PATH}"
-        )
-        raise FileNotFoundError(msg)
+        if attr := self.__dict__.get(attrname):
+            return attr
 
-else:
-    # Fall back to hard coded data
-    ERK_DATA_DIR = os.path.join(ERK_ROOT_DIR, "erk-data", "ocse")
-    ERK_DATA_PATH = os.path.join(ERK_DATA_DIR, "control_theory1.py")
-    ERK_DATA_MOD_NAME = "control_theory1"
+        if not self.store["initialized"]:
+            msg = "initialization of pyerk settings is incomplete"
+            raise ValueError(msg)
+
+        try:
+            return self.store[attrname]
+        except KeyError:
+            msg = f"unknown attribute `{attrname}` for settings."
+            raise AttributeError(msg)
+
+    def initialize_pyerk_settings(self):
+        import pyerk.settings
+        self.store["DEFAULT_DATA_LANGUAGE"] = pyerk.settings.DEFAULT_DATA_LANGUAGE
+
+        conf = pyerk.settings.CONF
+        main_mod = conf["main_module"]
+
+        self.store["ERK_DATA_MAIN_MOD_NAME"] = main_mod.rstrip(".py")
+        self.store["ERK_DATA_MAIN_MOD"] = os.path.join(pyerk.settings.BASE_DIR, main_mod)
+        self.store["ERK_DATA_MAIN_MOD_PREFIX"] = conf["main_module_prefix"]
+        self.store["ERK_DATA_BASE_DIR"] = pyerk.settings.BASE_DIR
+
+        self.store["initialized"] = True
+
+
+LC = LazyContainer()

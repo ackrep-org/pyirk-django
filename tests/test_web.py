@@ -2,6 +2,7 @@ import os
 import urllib
 import json
 import shutil
+from pathlib import Path
 from bs4 import BeautifulSoup
 import unittest
 from django.test import TransactionTestCase, TestCase  # noqa
@@ -15,10 +16,19 @@ from django.conf import settings
 # because every testcase rewinds its transactions
 settings.RUNNING_TESTS = True
 
+# assume directory structure as in README
+if not os.environ.get("PYERK_BASE_DIR"):
+    os.environ["PYERK_BASE_DIR"] = \
+        Path("./").joinpath("..", "erk-data-for-unittests", "erk-ocse").absolute().as_posix()
+
 
 # noinspection PyUnresolvedReferences
 import pyerkdjango.util  # noqa
 import pyerk  # noqa
+
+# now when pyerk has been imported, we can initialize the respective settings
+settings.LC.initialize_pyerk_settings()
+
 
 # noinspection PyUnresolvedReferences
 from pyerkdjango import models  # noqa
@@ -31,7 +41,7 @@ from pyerkdjango import models  # noqa
 # noinspection PyUnresolvedReferences
 from pyerkdjango.util import w, u, q_reverse, urlquote  # noqa
 
-ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
+# ERK_ROOT_DIR = pyerk.aux.get_erk_root_dir()
 
 # TODO:
 # currently loading of ocse is hardcoded in views -> util; This should be refactored in the future (use config file)
@@ -54,6 +64,25 @@ class Test_01_Basics(TestCase):
         url = reverse("landingpage")
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
+
+    def test03_home_page_modules_loading_behavior(self):
+        # load the landing page again to see if tests interact (not wantend)
+        url = reverse("landingpage")
+
+        # initial state: ocse test data should not be loaded
+        res = self.client.get(url)
+        content = res.content.decode("utf8")
+        self.assertEqual(res.status_code, 200)
+        self.assertNotIn("utc_loaded_module:erk:/ocse/0.2/math", content)
+        self.assertNotIn("utc_loaded_module:erk:/ocse/0.2/control_theory", content)
+
+        # now load the data
+        pyerkdjango.util.reload_data_if_necessary(speedup=False)
+
+        res = self.client.get(url)
+        content = res.content.decode("utf8")
+        self.assertIn("utc_loaded_module:erk:/ocse/0.2/math", content)
+        self.assertIn("utc_loaded_module:erk:/ocse/0.2/control_theory", content)
 
 
 class Test_02_MainApp(TestCase):
