@@ -32,7 +32,7 @@ class Entity(BaseModel):
 
     def get_label(self, langtag=None) -> str:
         if langtag is None:
-            langtag = settings.DEFAULT_DATA_LANGUAGE
+            langtag = settings.LC.DEFAULT_DATA_LANGUAGE
         # noinspection PyUnresolvedReferences
         res = self.label.filter(langtag=langtag)
         if len(res) == 0:

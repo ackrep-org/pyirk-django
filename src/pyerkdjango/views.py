@@ -22,8 +22,13 @@ from .models import Entity
 from . import vis_integration
 
 
+def home_page_view0(request):
+
+    return HttpResponse("klappt")
+
+
 def home_page_view(request):
-    # util.reload_data_if_necessary()
+    util.reload_data_if_necessary()
 
     # this is a list of tuples like `[('erk:/ocse/0.2/math',  '/path/to/erk-data/ocse/math1.py'), ...],
     mods = list(pyerk.ds.mod_path_mapping.a.items())
@@ -65,6 +70,7 @@ def _entity_sort_key(entity) -> Tuple[str, int]:
 def get_item(request):
 
     q = request.GET.get("q")
+    util.reload_data_if_necessary()
 
     payload = []
     if q:
@@ -83,7 +89,8 @@ def get_item(request):
                 )
             except KeyError:
                 # there seemse to be a bug related to data reloading and automatic key generation
-                # IPS()
+                IPS()
+                return JsonResponse({"status": 200, "data": []})
                 raise
 
             payload.append(res)
@@ -140,7 +147,14 @@ def render_entity_inline(entity: Union[Entity, pyerk.Entity], **kwargs) -> str:
     if isinstance(entity, pyerk.Entity):
         code_entity = entity
     elif isinstance(entity, Entity):
-        code_entity = pyerk.ds.get_entity_by_uri(entity.uri)
+        try:
+            code_entity = pyerk.ds.get_entity_by_uri(entity.uri)
+        except pyerk.auxiliary.UnknownURIError:
+            # problematic: # erk:/ocse/0.2/zebra_puzzle_rules#I701
+
+            #hack
+            code_entity = pyerk.ds.get_entity_by_uri("erk:/builtins#I40")
+            # IPS()
     else:
         # TODO: improve handling of literal values
         assert isinstance(entity, (str, int, float, complex))
