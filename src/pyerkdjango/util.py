@@ -17,13 +17,18 @@ from pyerk import (  # noqa
 )
 from .models import Entity, LanguageSpecifiedString as LSS
 
+DB_ALREADY_LOADED = False
+
 
 def reload_data_if_necessary(force: bool = False, speedup: bool = True) -> Container:
     res = Container()
     res.modules = reload_modules_if_necessary(force=force)
 
     # TODO: test if db needs to be reloaded
-    res.db = load_erk_entities_to_db(speedup=speedup)
+    if force or not DB_ALREADY_LOADED:
+        res.db = load_erk_entities_to_db(speedup=speedup)
+    else:
+        print("→ omit: 0 objects loaded")
 
     return res
 
@@ -78,6 +83,11 @@ def load_erk_entities_to_db(speedup: bool = True) -> int:
     n = len(Entity.objects.all())
     n += len(LSS.objects.all())
 
+    print(n, "objects loaded")
+
+    global DB_ALREADY_LOADED
+    DB_ALREADY_LOADED = True
+
     return n
 
 
@@ -109,6 +119,7 @@ def __load_entities_to_db(speedup: bool) -> None:
 
     entity_list = []
     label_list = []
+
     for ent in itertools.chain(pyerk.ds.items.values(), pyerk.ds.relations.values()):
         label = create_lss(ent, "R1")
         entity = Entity(uri=ent.uri, description=getattr(ent, "R2", None))
