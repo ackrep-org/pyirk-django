@@ -32,11 +32,9 @@ def reload_data_if_necessary(force: bool = False, speedup: bool = True) -> Conta
 def reload_modules_if_necessary(force: bool = False) -> int:
     count = 0
 
-    # TODO: this should be read from a config file
-
-    # load ocse
-    if force or pyerk.settings.OCSE_URI not in pyerk.ds.uri_prefix_mapping.a:
-        LC = settings.LC
+    # load the main_module specified in the config file (erkpackage.toml)
+    LC = settings.LC
+    if force or LC.ERK_DATA_MAIN_MOD_PREFIX not in pyerk.ds.uri_prefix_mapping.b:
         _ = pyerk.erkloader.load_mod_from_path(
             LC.ERK_DATA_MAIN_MOD, prefix=LC.ERK_DATA_MAIN_MOD_PREFIX, modname=LC.ERK_DATA_MAIN_MOD_NAME,
         )
