@@ -1,10 +1,21 @@
+import os
+import sys
+import pathlib
+
 from django.test import TestCase
 from django.urls import reverse
+
+from django.conf import settings
 from ipydex import IPS
 
 # The tests can be run with
 # `python manage.py test`
 # `python manage.py test --rednose` # with colors
+
+current_path = os.path.abspath(sys.modules.get(__name__).__file__)
+q = os.environ["PYERK_BASE_DIR"] = (pathlib.Path(current_path).parents[3] / "erk-data-for-unittests/ocse/").as_posix()
+
+settings.LC.initialize_pyerk_settings()
 
 
 class TestMainApp1(TestCase):

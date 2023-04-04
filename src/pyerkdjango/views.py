@@ -188,11 +188,11 @@ def render_entity_relations(db_entity: Entity) -> str:
     # #########################################################################
 
     # dict like {"R1": [<RelationEdge 1234>, ...], "R2": [...]}
-    relation_edges0 = pyerk.ds.relation_edges[uri]
+    statements0 = pyerk.ds.statements[uri]
 
     # create a flat list of template-friendly dicts
     re_dict_2tuples = []
-    for rel_key, re_list in relation_edges0.items():
+    for rel_key, re_list in statements0.items():
         if rel_key in black_listed_keys:
             continue
         for re in re_list:
@@ -206,11 +206,11 @@ def render_entity_relations(db_entity: Entity) -> str:
     # #########################################################################
 
     # dict like {"R4": [<RelationEdge 1234>, ...], "R8": [...]}
-    inv_relation_edges0 = pyerk.ds.inv_relation_edges[uri]
+    inv_statements0 = pyerk.ds.inv_statements[uri]
 
     # create a flat list of template-friendly dicts
     inv_re_dict_2tuples = []
-    for rel_key, inv_re_list in inv_relation_edges0.items():
+    for rel_key, inv_re_list in inv_statements0.items():
         if rel_key in black_listed_keys:
             continue
         for re in inv_re_list:
@@ -248,17 +248,17 @@ def render_entity_scopes(db_entity: Entity) -> str:
         items = pyerk.get_items_defined_in_scope(scope)
         re: pyerk.RelationEdge
         # currently we only use `R4__instance_of` as "defining relation"
-        # relation_edges = [re for key, re_list in relation_edges0.items() if key not in black_listed_keys for re in re_list]
+        # statements = [re for key, re_list in statements0.items() if key not in black_listed_keys for re in re_list]
         defining_relation_triples = []
         for item in items:
-            for re in pyerk.ds.relation_edges[item.short_key]["R4"]:
+            for re in pyerk.ds.statements[item.short_key]["R4"]:
                 defining_relation_triples.append(list(map(represent_entity_as_dict, re.relation_tuple)))
 
         # #### second: handle further relation triples in this scope
 
         statement_relations = []
         re: pyerk.RelationEdge
-        for re in pyerk.ds.scope_relation_edges[scope.short_key]:
+        for re in pyerk.ds.scope_statements[scope.short_key]:
             dict_tup = tuple(represent_entity_as_dict(elt) for elt in re.relation_tuple)
             statement_relations.append(dict_tup)
 
