@@ -27,8 +27,10 @@ def reload_data_if_necessary(force: bool = False, speedup: bool = True) -> Conta
     # TODO: test if db needs to be reloaded
     if force or not DB_ALREADY_LOADED:
         res.db = load_erk_entities_to_db(speedup=speedup)
-    else:
-        print("→ omit: 0 objects loaded")
+
+    # n = len(Entity.objects.all())
+    # n += len(LSS.objects.all())
+    # print(f"→ omit: 0 objects loaded; {n} objects in db")
 
     return res
 

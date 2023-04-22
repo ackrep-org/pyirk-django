@@ -28,7 +28,7 @@ def home_page_view0(request):
 
 
 def home_page_view(request):
-    util.reload_data_if_necessary()
+    # util.reload_data_if_necessary()
 
     # this is a list of tuples like `[('erk:/ocse/0.2/math',  '/path/to/erk-data/ocse/math1.py'), ...],
     mods = list(pyerk.ds.mod_path_mapping.a.items())
@@ -70,7 +70,7 @@ def _entity_sort_key(entity) -> Tuple[str, int]:
 def get_item(request):
 
     q = request.GET.get("q")
-    util.reload_data_if_necessary()
+    # util.reload_data_if_necessary()
 
     payload = []
     if q:

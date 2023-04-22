@@ -76,10 +76,11 @@ class HouskeeperMixin:
             method()
 
     def print_methodnames(self):
+        cls = self.__class__
+        method_repr = f"{cls.__module__}:{cls.__qualname__}.{self._testMethodName}"
+        os.environ["UNITTEST_METHOD_NAME"] = method_repr
         if PRINT_TEST_METHODNAMES:
             # noinspection PyUnresolvedReferences
-            cls = self.__class__
-            method_repr = f"{cls.__module__}:{cls.__qualname__}.{self._testMethodName}"
             print("In method", pyerkdjango.util.aux.bgreen(method_repr))
 
 
@@ -107,6 +108,7 @@ class Test_01_Basics(HouskeeperMixin, TestCase):
         res = self.client.get(url)
         content = res.content.decode("utf8")
         self.assertEqual(res.status_code, 200)
+
         self.assertNotIn(f"utc_loaded_module:{MATH_URI}", content)
         self.assertNotIn(f"utc_loaded_module:{CT_URI}", content)
 
@@ -124,7 +126,9 @@ class Test_01_Basics(HouskeeperMixin, TestCase):
 class Test_02_MainApp(HouskeeperMixin, TestCase):
     def custom_setUp(self):
         # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
-        pyerkdjango.util.reload_data_if_necessary(speedup=False)
+
+        # force is necessary: the database is emptied after each test, but the DB_ALREADY_LOADED flag remains true
+        pyerkdjango.util.reload_data_if_necessary(speedup=False, force=True)
 
     def test01_home_page1(self):
 
