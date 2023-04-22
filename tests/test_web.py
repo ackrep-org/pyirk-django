@@ -12,19 +12,25 @@ from textwrap import dedent as twdd
 # noinspection PyUnresolvedReferences
 from ipydex import IPS  # noqa
 from django.conf import settings
-# this is relevant for switching off some database optimizations which are incompatible with django.test.TestCase
-# because every testcase rewinds its transactions
-settings.RUNNING_TESTS = True
 
 # assume directory structure as in README
 if not os.environ.get("PYERK_BASE_DIR"):
     os.environ["PYERK_BASE_DIR"] = \
         Path("./").joinpath("..", "erk-data-for-unittests", "erk-ocse").absolute().as_posix()
 
+os.environ["PYERK_BASE_DIR"] = os.path.abspath(os.environ["PYERK_BASE_DIR"])
+
+
+# if this fails the tests should not be run
+assert os.path.isdir(os.environ["PYERK_BASE_DIR"]), f'path not found: {os.environ["PYERK_BASE_DIR"]}'
 
 # noinspection PyUnresolvedReferences
 import pyerkdjango.util  # noqa
 import pyerk  # noqa
+
+# this is relevant for switching off some database optimizations which are incompatible with django.test.TestCase
+# because every testcase rewinds its transactions
+settings.RUNNING_TESTS = True
 
 # now when pyerk has been imported, we can initialize the respective settings
 settings.LC.initialize_pyerk_settings()
