@@ -231,6 +231,9 @@ class LazyContainer:
         self.store["DEFAULT_DATA_LANGUAGE"] = pyerk.settings.DEFAULT_DATA_LANGUAGE
 
         conf = pyerk.settings.CONF
+        if not conf:
+            msg = "`pyerk.settings.CONF` is empty, probably because env variable PYERK_BASE_DIR is empty or wrong"
+            raise FileNotFoundError(msg)
         main_mod = conf["main_module"]
 
         self.store["ERK_DATA_MAIN_MOD_NAME"] = main_mod.rstrip(".py")
