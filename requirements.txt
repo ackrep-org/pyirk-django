@@ -1,4 +1,4 @@
-django
+django >= django-4.5.2
 ipydex
 django-bleach
 markdown

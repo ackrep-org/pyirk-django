@@ -139,7 +139,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
 
         # `utc` means "unit test comment"
         # this is a simple mechanism to ensure the desired content actually was delivered
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
         self.assertContains(res, "utc_landing_page")
 
     def test02_search_api(self):
@@ -180,7 +180,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
 
         url = "/search/?q=bound"
         res = self.client.get(url)
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
 
     def test04_entity_detail_view2(self):
         # test displaying an entity from a loaded module
@@ -189,26 +189,26 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         # mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         url = reverse("entitypage", kwargs=dict(uri=w("ct__I9907")))
         res = self.client.get(url)
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
         # TODO: add some actual test code here (which was probaly forgotten earlier)
         # likely it was intended to test context-rendering
 
     def test05_sparql_page(self):
         url = reverse("sparqlpage")
         res = self.client.get(url)
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
 
         url = (
             "/sparql/?query=%0D%0APREFIX+%3A+%3Cerk%3A%2F%3E%0D%0ASELECT+*%0D%0AWHERE"
             "+%7B%0D%0A++++%3Fs+%3AR5+%3Fo.%0D%0A%7D%0D%0A"
         )
         res = self.client.get(url)
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
 
     def test06_reload_via_url(self):
         url = reverse("reload")
         res = self.client.get(url)
-        self.assertEquals(res.status_code, 302)
+        self.assertEqual(res.status_code, 302)
 
     def test07_LanguageSpecifiedString(self):
         _ = models.LanguageSpecifiedString.objects.create(langtag="en", content="test1")
@@ -293,7 +293,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
 
         url = reverse("show_editor")
         res = self.client.get(url)
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
         content = res.content.decode("utf8")
         self.assertNotIn("utc_error", content)
         self.assertIn("utc_editor_page", content)
@@ -301,7 +301,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         uri = MATH_URI
         url = reverse("show_editor_with_uri", kwargs=dict(uri=uri))
         res = self.client.get(url)
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
         content = res.content.decode("utf8")
         self.assertNotIn("utc_error", content)
         self.assertIn(f"utc_uri_of_loaded_file:{uri}", content)
@@ -316,7 +316,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
 
         url = reverse("save_file")
         res = self.client.get(url)
-        self.assertEquals(res.status_code, 200)
+        self.assertEqual(res.status_code, 200)
 
 
 class Test_03_Utils(HouskeeperMixin, unittest.TestCase):
