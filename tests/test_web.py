@@ -26,7 +26,7 @@ assert os.path.isdir(os.environ["PYERK_BASE_DIR"]), f'path not found: {os.enviro
 
 # noinspection PyUnresolvedReferences
 import pyerkdjango.util  # noqa
-import pyerk  # noqa
+import pyerk  as p
 
 # this is relevant for switching off some database optimizations which are incompatible with django.test.TestCase
 # because every testcase rewinds its transactions
@@ -53,6 +53,9 @@ os.environ["UNITTEST"] = "True"
 MATH_URI = "erk:/ocse/0.2/math"
 CT_URI = "erk:/ocse/0.2/control_theory"
 
+# for now this is the same as in the pyerk-tests
+__URI__ = TEST_BASE_URI = "erk:/local/unittest"
+
 
 # this serves to print the test-method-name before it is executed (useful for debugging, see setUP below)
 PRINT_TEST_METHODNAMES = True
@@ -65,12 +68,14 @@ class HouskeeperMixin:
 
     def setUp(self):
         self.print_methodnames()
-
+        self.register_this_module()
         if method := getattr(self, "custom_setUp", None):
             assert callable(method)
             method()
 
+
     def tearDown(self) -> None:
+        self.unload_all_mods()
         if method := getattr(self, "custom_tearDown", None):
             assert callable(method)
             method()
@@ -82,6 +87,19 @@ class HouskeeperMixin:
         if PRINT_TEST_METHODNAMES:
             # noinspection PyUnresolvedReferences
             print("In method", pyerkdjango.util.aux.bgreen(method_repr))
+
+    @staticmethod
+    def unload_all_mods():
+        p.unload_mod(TEST_BASE_URI, strict=False)
+
+        # unload all modules which where loaded by a test
+        for mod_id in list(p.ds.mod_path_mapping.a.keys()):
+            p.unload_mod(mod_id)
+
+    @staticmethod
+    def register_this_module():
+        keymanager = p.KeyManager()
+        p.register_mod(TEST_BASE_URI, keymanager, prefix="ut")
 
 
 class Test_01_Basics(HouskeeperMixin, TestCase):
@@ -112,10 +130,12 @@ class Test_01_Basics(HouskeeperMixin, TestCase):
         self.assertNotIn(f"utc_loaded_module:{MATH_URI}", content)
         self.assertNotIn(f"utc_loaded_module:{CT_URI}", content)
 
+        # ensure only test module is loaded
+        self.assertIn(TEST_BASE_URI, p.ds.mod_path_mapping.a)
+        self.assertEqual(len(p.ds.mod_path_mapping.a), 1)
         # now load the data
-        self.assertEqual(len(pyerk.ds.mod_path_mapping.a), 0)
         pyerkdjango.util.reload_data_if_necessary(speedup=False)
-        self.assertNotEqual(len(pyerk.ds.mod_path_mapping.a), 0)
+        self.assertNotEqual(len(p.ds.mod_path_mapping.a), 0)
 
         res = self.client.get(url)
         content = res.content.decode("utf8")
@@ -186,7 +206,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         # test displaying an entity from a loaded module
 
         # note: currently the ocse is already loaded in the views
-        # mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
+        # mod1 = p.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         url = reverse("entitypage", kwargs=dict(uri=w("ct__I9907")))
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
@@ -211,13 +231,23 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         self.assertEqual(res.status_code, 302)
 
     def test07_LanguageSpecifiedString(self):
+
+        with p.uri_context(uri=TEST_BASE_URI):
+
+            I900 = p.create_item(
+                R1__has_label="default label",
+                R1__has_label__de="deutsches label" @ p.de,
+            )
+
+        pyerkdjango.util.reload_data_if_necessary(force=True, speedup=False)
+
         _ = models.LanguageSpecifiedString.objects.create(langtag="en", content="test1")
         t2 = models.LanguageSpecifiedString.objects.create(langtag="de", content="test1")
         res = models.LanguageSpecifiedString.objects.filter(langtag="de")
         self.assertGreaterEqual(len(res), 1)
 
         self.assertIn(t2, res)
-        x = models.Entity.objects.get(uri=u("I900"))
+        x = models.Entity.objects.get(uri=u("ut__I900"))
         res = x.label.filter(langtag="en")
         self.assertGreaterEqual(len(res), 1)
 
@@ -230,8 +260,8 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         self.assertGreater(len(res), 5)
 
     def test08_web_visualization1(self):
-        # mod1 = pyerk.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
-        self.assertIn("ct", pyerk.ds.uri_prefix_mapping.b)
+        # mod1 = p.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
+        self.assertIn("ct", p.ds.uri_prefix_mapping.b)
 
         url = reverse("entityvisualization", kwargs=dict(uri=w("ct__I9907")))
         res = self.client.get(url)
