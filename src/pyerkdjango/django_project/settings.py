@@ -45,8 +45,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # for improved testing experience
-    "django_nose",
     # to safely render HTML
     "django_bleach",
     # the example app

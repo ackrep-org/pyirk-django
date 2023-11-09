@@ -34,3 +34,8 @@ where = ["src"]
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 version = {attr = "pyerkdjango.__version__"}
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "src.pyerkdjango.django_project.settings"
+# -- recommended but optional:
+python_files = ["test_*.py", "*_test.py", "testing/python/*.py"]

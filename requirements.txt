@@ -1,6 +1,4 @@
 django
-django_nose
-rednose
 ipydex
 django-bleach
 markdown
@@ -9,3 +7,4 @@ beautifulsoup4
 tabulate
 lxml
 tomli >= 1.1.0 ; python_version < "3.11"
+pytest-django
