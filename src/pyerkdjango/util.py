@@ -68,6 +68,10 @@ def load_erk_entities_to_db(speedup: bool = True) -> int:
     :return:            number of entities loaded
     """
 
+    # TODO: delete this?
+    # this was added to main (2022-09-09) but never merged to develop
+    # pyerk.ackrep_parser.parse_ackrep()
+
     # delete all existing data (if database already exisits)
     try:
         Entity.objects.all().delete()
