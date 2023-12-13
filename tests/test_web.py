@@ -288,7 +288,6 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
 
         txt = f'<a href="{item_url}">I9906'
 
-        # IPS()
         self.assertIn(txt, content)
 
         url_vis = reverse("entityvisualization", kwargs={"uri": urlquote(u("ma__I9906"))})
