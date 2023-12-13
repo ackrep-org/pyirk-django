@@ -9,12 +9,13 @@ Web frontend for [pyirk](https://github.com/ackrep-org/pyirk-core).
 
 - Install [pyirk](https://github.com/ackrep-org/pyirk-core) (version >= 0.12) from suitable branch.
     - Recommended installation: clone the repo, then run `pip install -e .` within the repo
+- Install [graphviz](https://www.graphviz.org/download/) binaries (only necessary for the visualization)
 - Install pyerkdjago (this package):
     - clone the repo, enter the directory, then run:
     - `pip install -r requirements.txt`
     - `pip install -e .`
     - `python manage.py migrate`  (create the database)
-    - `pytest` (make sure tests pass)
+    - `pytest` (make sure tests pass; some tests will fail if graphviz is not installed)
 - Download data (e.g. [OCSE](https://github.com/ackrep-org/ocse))
 - Explore the data:
     - enter the data-directory (where `irkpackage.toml` is located)

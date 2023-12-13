@@ -20,12 +20,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Python 3.11
       uses: actions/setup-python@v2
       with:
         python-version: "3.11"
+
+    - name: Setup Graphviz
+      uses: ts-graphviz/setup-graphviz@v1
 
 # The following command allows to connect to the ci-container via ssh
 # very useful for debugging

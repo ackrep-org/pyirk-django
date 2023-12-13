@@ -263,6 +263,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         )
         self.assertGreater(len(res), 5)
 
+    # this test will fail if graphviz is not installed
     def test08_web_visualization1(self):
         # mod1 = p.irkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         self.assertIn("ct", p.ds.uri_prefix_mapping.b)
