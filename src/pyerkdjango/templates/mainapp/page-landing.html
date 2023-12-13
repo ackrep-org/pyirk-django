@@ -2,13 +2,13 @@
 {% load static %}
 {% load bleach_tags %}
 
-{% block title %}erk: easy representation of knowledge{% endblock %}
+{% block title %}irk: easy representation of knowledge{% endblock %}
 
 {% block page-header-supplement %}
 <div class="headerbar-content">
 <div class="headerbar-loaded-modules">
 Loaded modules:
-{% for tup in loaded_pyerk_mods %}
+{% for tup in loaded_pyirk_mods %}
 <a href="{% url 'show_editor_with_uri' uri=tup.0|urlencode|iriencode %}" title="local path: {{tup.1}}">{{tup.0}}</a>;&nbsp;
 <!-- utc_loaded_module:{{tup.0}}  -->
 {# TODO: unittest for this #}

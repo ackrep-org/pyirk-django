@@ -1,9 +1,9 @@
 # General Information
 
-Web frontend for [pyerk](https://github.com/ackrep-org/pyerk-core).
+Web frontend for [pyirk](https://github.com/ackrep-org/pyirk-core).
 
 
 
 # Local Deployment
 
-pyerk-django is offers interactive access to explore erk an erk-package. To enable this use `export PYERK_BASE_DIR=<path/to/erk-package>`.
+pyirk-django is offers interactive access to explore irk an irk-package. To enable this use `export PYIRK_BASE_DIR=<path/to/irk-package>`.

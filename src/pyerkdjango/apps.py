@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class MainAppConfig(AppConfig):
-    name = "pyerkdjango"
+    name = "pyirkdjango"

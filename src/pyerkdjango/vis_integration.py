@@ -1,5 +1,5 @@
 """
-This module contains code to integrate visualization of ERK-entities into the web application.
+This module contains code to integrate visualization of IRK-entities into the web application.
 """
 
 from typing import Union
@@ -7,7 +7,7 @@ from typing import Union
 from django.urls import reverse
 from ipydex import IPS, activate_ips_on_exception
 
-from pyerk import visualization
+from pyirk import visualization
 
 
 def create_visualization(db_entity, vis_options: dict) -> Union[None, str]:

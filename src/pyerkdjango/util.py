@@ -9,9 +9,9 @@ from django.db import transaction
 from django.urls import reverse
 from addict import Addict as Container
 
-import pyerk
+import pyirk
 # noinspection PyUnresolvedReferences
-from pyerk import (  # noqa
+from pyirk import (  # noqa
     u,  # convenience function to convert a key into an URI
     auxiliary as aux,
 )
@@ -26,7 +26,7 @@ def reload_data_if_necessary(force: bool = False, speedup: bool = True) -> Conta
 
     # TODO: test if db needs to be reloaded
     if force or not DB_ALREADY_LOADED:
-        res.db = load_erk_entities_to_db(speedup=speedup)
+        res.db = load_irk_entities_to_db(speedup=speedup)
 
     # n = len(Entity.objects.all())
     # n += len(LSS.objects.all())
@@ -39,25 +39,25 @@ def reload_data_if_necessary(force: bool = False, speedup: bool = True) -> Conta
 def reload_modules_if_necessary(force: bool = False) -> int:
     count = 0
 
-    # load the main_module specified in the config file (erkpackage.toml)
+    # load the main_module specified in the config file (irkpackage.toml)
     LC = settings.LC
-    if force or LC.ERK_DATA_MAIN_MOD_PREFIX not in pyerk.ds.uri_prefix_mapping.b:
-        _ = pyerk.erkloader.load_mod_from_path(
-            LC.ERK_DATA_MAIN_MOD, prefix=LC.ERK_DATA_MAIN_MOD_PREFIX, modname=LC.ERK_DATA_MAIN_MOD_NAME,
+    if force or LC.IRK_DATA_MAIN_MOD_PREFIX not in pyirk.ds.uri_prefix_mapping.b:
+        _ = pyirk.irkloader.load_mod_from_path(
+            LC.IRK_DATA_MAIN_MOD, prefix=LC.IRK_DATA_MAIN_MOD_PREFIX, modname=LC.IRK_DATA_MAIN_MOD_NAME,
         )
         count += 1
 
     # TODO: remove this obsolete code
     if 0:
         # load ackrep entities
-        if force or pyerk.ackrep_parser.__URI__ not in pyerk.ds.uri_prefix_mapping.a:
-            pyerk.ackrep_parser.load_ackrep_entities(base_path=None, strict=True)
+        if force or pyirk.ackrep_parser.__URI__ not in pyirk.ds.uri_prefix_mapping.a:
+            pyirk.ackrep_parser.load_ackrep_entities(base_path=None, strict=True)
             count += 1
 
     return count
 
 
-def load_erk_entities_to_db(speedup: bool = True) -> int:
+def load_irk_entities_to_db(speedup: bool = True) -> int:
     """
     Load data from python-module into data base to allow simple searching
 
@@ -70,7 +70,7 @@ def load_erk_entities_to_db(speedup: bool = True) -> int:
 
     # TODO: delete this?
     # this was added to main (2022-09-09) but never merged to develop
-    # pyerk.ackrep_parser.parse_ackrep()
+    # pyirk.ackrep_parser.parse_ackrep()
 
     # delete all existing data (if database already exisits)
     try:
@@ -126,14 +126,14 @@ def __load_entities_to_db(speedup: bool) -> None:
     entity_list = []
     label_list = []
 
-    for ent in itertools.chain(pyerk.ds.items.values(), pyerk.ds.relations.values()):
+    for ent in itertools.chain(pyirk.ds.items.values(), pyirk.ds.relations.values()):
         label = create_lss(ent, "R1")
         entity = Entity(uri=ent.uri, description=getattr(ent, "R2", None))
 
         label_list.append(label)
         entity_list.append(entity)
 
-    # print(pyerk.auxiliary.bcyan(f"time1: {time.time() - t0}"))
+    # print(pyirk.auxiliary.bcyan(f"time1: {time.time() - t0}"))
     Entity.objects.bulk_create(entity_list)
     LSS.objects.bulk_create(label_list)
 
@@ -144,21 +144,21 @@ def __load_entities_to_db(speedup: bool) -> None:
     for entity, label in zip(Entity.objects.all(), LSS.objects.all()):
         entity.label.add(label)
 
-    # print(pyerk.auxiliary.bcyan(f"time2: {time.time() - t0}"))
+    # print(pyirk.auxiliary.bcyan(f"time2: {time.time() - t0}"))
 
 
 def unload_data(strict=False):
 
     # unload all loaded modules
-    for uri, name in pyerk.ds.modnames.items():
-        pyerk.unload_mod(uri, strict=strict)
+    for uri, name in pyirk.ds.modnames.items():
+        pyirk.unload_mod(uri, strict=strict)
 
     # unload db
     Entity.objects.all().delete()
     LSS.objects.all().delete()
 
 
-def create_lss(ent: pyerk.Entity, rel_key: str) -> LSS:
+def create_lss(ent: pyirk.Entity, rel_key: str) -> LSS:
     """
     Create a language specified string (see models.LanguageSpecifiedString).
     Note: the object is not yet commited to the database.
@@ -167,7 +167,7 @@ def create_lss(ent: pyerk.Entity, rel_key: str) -> LSS:
     :param rel_key:
     :return:
     """
-    rdf_literal = pyerk.aux.ensure_rdf_str_literal(getattr(ent, rel_key, ""))
+    rdf_literal = pyirk.aux.ensure_rdf_str_literal(getattr(ent, rel_key, ""))
     return LSS(langtag=rdf_literal.language, content=rdf_literal.value)
 
 
@@ -178,13 +178,13 @@ def urlquote(txt):
 
 def w(key_str: str) -> str:
     """
-    Call pyerk.u(*args) (convert (builtin) key to uri) and pass it through urlib.parse.quote
+    Call pyirk.u(*args) (convert (builtin) key to uri) and pass it through urlib.parse.quote
 
-    :param key_str:     see pyerk.u
+    :param key_str:     see pyirk.u
     :return:
     """
 
-    res = pyerk.u(key_str)
+    res = pyirk.u(key_str)
     return urlquote(res)
 
 

@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("pyerkdjango", "0001_initial"),
+        ("pyirkdjango", "0001_initial"),
     ]
 
     operations = [
@@ -38,6 +38,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="entity",
             name="label",
-            field=models.ManyToManyField(to="pyerkdjango.languagespecifiedstring"),
+            field=models.ManyToManyField(to="pyirkdjango.languagespecifiedstring"),
         ),
     ]

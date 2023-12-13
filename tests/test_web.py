@@ -14,30 +14,30 @@ from ipydex import IPS  # noqa
 from django.conf import settings
 
 # assume directory structure as in README
-if not os.environ.get("PYERK_BASE_DIR"):
-    os.environ["PYERK_BASE_DIR"] = \
-        Path("./").joinpath("..", "erk-data-for-unittests", "erk-ocse").absolute().as_posix()
+if not os.environ.get("PYIRK_BASE_DIR"):
+    os.environ["PYIRK_BASE_DIR"] = \
+        Path("./").joinpath("..", "irk-data-for-unittests", "irk-ocse").absolute().as_posix()
 
-os.environ["PYERK_BASE_DIR"] = os.path.abspath(os.environ["PYERK_BASE_DIR"])
+os.environ["PYIRK_BASE_DIR"] = os.path.abspath(os.environ["PYIRK_BASE_DIR"])
 
 
 # if this fails the tests should not be run
-assert os.path.isdir(os.environ["PYERK_BASE_DIR"]), f'path not found: {os.environ["PYERK_BASE_DIR"]}'
+assert os.path.isdir(os.environ["PYIRK_BASE_DIR"]), f'path not found: {os.environ["PYIRK_BASE_DIR"]}'
 
 # noinspection PyUnresolvedReferences
-import pyerkdjango.util  # noqa
-import pyerk  as p
+import pyirkdjango.util  # noqa
+import pyirk  as p
 
 # this is relevant for switching off some database optimizations which are incompatible with django.test.TestCase
 # because every testcase rewinds its transactions
 settings.RUNNING_TESTS = True
 
-# now when pyerk has been imported, we can initialize the respective settings
-settings.LC.initialize_pyerk_settings()
+# now when pyirk has been imported, we can initialize the respective settings
+settings.LC.initialize_pyirk_settings()
 
 
 # noinspection PyUnresolvedReferences
-from pyerkdjango import models  # noqa
+from pyirkdjango import models  # noqa
 
 # The tests can be run with
 # `python manage.py test`
@@ -45,16 +45,16 @@ from pyerkdjango import models  # noqa
 
 
 # noinspection PyUnresolvedReferences
-from pyerkdjango.util import w, u, q_reverse, urlquote  # noqa
+from pyirkdjango.util import w, u, q_reverse, urlquote  # noqa
 
 
 os.environ["UNITTEST"] = "True"
 
-MATH_URI = "erk:/ocse/0.2/math"
-CT_URI = "erk:/ocse/0.2/control_theory"
+MATH_URI = "irk:/ocse/0.2/math"
+CT_URI = "irk:/ocse/0.2/control_theory"
 
-# for now this is the same as in the pyerk-tests
-__URI__ = TEST_BASE_URI = "erk:/local/unittest"
+# for now this is the same as in the pyirk-tests
+__URI__ = TEST_BASE_URI = "irk:/local/unittest"
 
 
 # this serves to print the test-method-name before it is executed (useful for debugging, see setUP below)
@@ -86,7 +86,7 @@ class HouskeeperMixin:
         os.environ["UNITTEST_METHOD_NAME"] = method_repr
         if PRINT_TEST_METHODNAMES:
             # noinspection PyUnresolvedReferences
-            print("In method", pyerkdjango.util.aux.bgreen(method_repr))
+            print("In method", pyirkdjango.util.aux.bgreen(method_repr))
 
     @staticmethod
     def unload_all_mods():
@@ -134,7 +134,7 @@ class Test_01_Basics(HouskeeperMixin, TestCase):
         self.assertIn(TEST_BASE_URI, p.ds.mod_path_mapping.a)
         self.assertEqual(len(p.ds.mod_path_mapping.a), 1)
         # now load the data
-        pyerkdjango.util.reload_data_if_necessary(speedup=False)
+        pyirkdjango.util.reload_data_if_necessary(speedup=False)
         self.assertNotEqual(len(p.ds.mod_path_mapping.a), 0)
 
         res = self.client.get(url)
@@ -148,7 +148,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         # set `speedup` to False because TestCase disallows things like `transaction.set_autocommit(False)`
 
         # force is necessary: the database is emptied after each test, but the DB_ALREADY_LOADED flag remains true
-        pyerkdjango.util.reload_data_if_necessary(speedup=False, force=True)
+        pyirkdjango.util.reload_data_if_necessary(speedup=False, force=True)
 
     def test01_home_page1(self):
 
@@ -183,12 +183,12 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         self.assertEqual(res.status_code, 200)
         content = res.content.decode("utf8")
         self.assertIn(
-            '<span class="entity-key highlight"><a href="/e/erk%253A%252Fbuiltins%2523I12">I12</a></span>', content
+            '<span class="entity-key highlight"><a href="/e/irk%253A%252Fbuiltins%2523I12">I12</a></span>', content
         )
 
         src1 = twdd(
             """
-            <span class="entity-key highlight"><a href="/e/erk%253A%252Fbuiltins%2523I12">I12</a></span><!--
+            <span class="entity-key highlight"><a href="/e/irk%253A%252Fbuiltins%2523I12">I12</a></span><!--
             --><!--
             --><!--
             -->["<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>"]<!--
@@ -206,7 +206,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         # test displaying an entity from a loaded module
 
         # note: currently the ocse is already loaded in the views
-        # mod1 = p.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
+        # mod1 = p.irkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         url = reverse("entitypage", kwargs=dict(uri=w("ct__I9907")))
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
@@ -219,7 +219,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         self.assertEqual(res.status_code, 200)
 
         url = (
-            "/sparql/?query=%0D%0APREFIX+%3A+%3Cerk%3A%2F%3E%0D%0ASELECT+*%0D%0AWHERE"
+            "/sparql/?query=%0D%0APREFIX+%3A+%3Cirk%3A%2F%3E%0D%0ASELECT+*%0D%0AWHERE"
             "+%7B%0D%0A++++%3Fs+%3AR5+%3Fo.%0D%0A%7D%0D%0A"
         )
         res = self.client.get(url)
@@ -239,7 +239,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
                 R1__has_label__de="deutsches label" @ p.de,
             )
 
-        pyerkdjango.util.reload_data_if_necessary(force=True, speedup=False)
+        pyirkdjango.util.reload_data_if_necessary(force=True, speedup=False)
 
         _ = models.LanguageSpecifiedString.objects.create(langtag="en", content="test1")
         t2 = models.LanguageSpecifiedString.objects.create(langtag="de", content="test1")
@@ -260,7 +260,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         self.assertGreater(len(res), 5)
 
     def test08_web_visualization1(self):
-        # mod1 = p.erkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
+        # mod1 = p.irkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         self.assertIn("ct", p.ds.uri_prefix_mapping.b)
 
         url = reverse("entityvisualization", kwargs=dict(uri=w("ct__I9907")))
@@ -277,9 +277,9 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         # test if labels have visualization links:
 
         # note: when hovering over the links firefox displays the unquoted version of this url
-        # i.e.: /e/erk:%2Focse%2F0.2#I9906/v
+        # i.e.: /e/irk:%2Focse%2F0.2#I9906/v
 
-        item_url = "/e/erk%253A%252Focse%252F0.2%252Fmath%2523I9906/v"
+        item_url = "/e/irk%253A%252Focse%252F0.2%252Fmath%2523I9906/v"
 
         txt = f'<a href="{item_url}">I9906'
 
@@ -371,13 +371,13 @@ class Test_03_Utils(HouskeeperMixin, unittest.TestCase):
 
         self.assertFalse(os.path.exists(self.fpath))
 
-        pyerkdjango.util.savetxt(self.fpath, test_content, backup=False)
+        pyirkdjango.util.savetxt(self.fpath, test_content, backup=False)
         self.assertTrue(os.path.exists(self.fpath))
 
         # test backup
         self.assertFalse(os.path.exists(self.backup_dir))
-        pyerkdjango.util.savetxt(self.fpath, test_content, backup=True)
-        self.assertTrue(os.path.exists(self.backup_dir))
+        pyirkdjango.util.savetxt(self.fpath, test_content, backup=True)
+    self.assertTrue(os.path.exists(self.backup_dir))
 
         dir_content = os.listdir(self.backup_dir)
         self.assertEqual(len(dir_content), 1)

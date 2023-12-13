@@ -20,7 +20,7 @@ def setup_django():
 
     if not settings_configured_flag:
         # mod_path = os.path.dirname(os.path.abspath(__file__))
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pyerkdjango.django_project.settings")
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pyirkdjango.django_project.settings")
         django.setup()
     else:
         pass
@@ -29,13 +29,13 @@ def setup_django():
 def start_django(*args, **kwargs):
     print("starting django")
 
-    # assume there is a file `erkpackage.toml` in the current working directory
-    # (or that `PYERK_BASE_DIR` was set
-    settings.LC.initialize_pyerk_settings()
+    # assume there is a file `irkpackage.toml` in the current working directory
+    # (or that `PYIRK_BASE_DIR` was set
+    settings.LC.initialize_pyirk_settings()
     management.call_command("runserver", *args, **kwargs)
 
 
 def start_django_shell(*args, **kwargs):
-    settings.LC.initialize_pyerk_settings()
+    settings.LC.initialize_pyirk_settings()
     print("starting django shell")
     management.call_command("shell", *args, **kwargs)

@@ -19,7 +19,7 @@ if not apps.apps_ready:
 
 if not settings_configured_flag:
 
-    os.environ["DJANGO_SETTINGS_MODULE"] = "pyerkdjango.django_project.settings"
+    os.environ["DJANGO_SETTINGS_MODULE"] = "pyirkdjango.django_project.settings"
     django.setup()
 else:
     pass

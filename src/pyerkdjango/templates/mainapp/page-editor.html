@@ -16,7 +16,7 @@
 
 <!-- utc_editor_page -->
 
-<h3 class="editor-heading">Edit Pyerk Module (with Autocompletion)</h3>
+<h3 class="editor-heading">Edit Pyirk Module (with Autocompletion)</h3>
 
 {% if err %}
 <div class="errorbox">
@@ -55,7 +55,7 @@ Load file ...
 </pre>
 {% else %}
 <pre id="editor">
-# Type your pyerk code here.
+# Type your pyirk code here.
 # Use CTRL+Space to trigger auto completion.
 </pre>
 {% endif %}
@@ -66,5 +66,5 @@ Load file ...
 {% block script %}
 <script type="text/javascript" charset="utf-8" src="{% static 'mainapp/ace/ace.js' %}"></script>
 <script type="text/javascript" charset="utf-8" src="{% static 'mainapp/ace/ext-language_tools.js' %}"></script>
-<script type="text/javascript" charset="utf-8" src="{% static 'mainapp/pyerk-ace.js' %}"></script>
+<script type="text/javascript" charset="utf-8" src="{% static 'mainapp/pyirk-ace.js' %}"></script>
 {% endblock  %} {# end block script#}

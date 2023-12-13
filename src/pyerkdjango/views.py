@@ -11,8 +11,8 @@ from django.views import View
 from django.db.models import Q
 from textwrap import dedent as twdd
 from tabulate import tabulate
-import pyerk
-import pyerk.rdfstack
+import pyirk
+import pyirk.rdfstack
 from . import util
 from addict import Dict as attr_dict
 
@@ -30,9 +30,9 @@ def home_page_view0(request):
 def home_page_view(request):
     # util.reload_data_if_necessary()
 
-    # this is a list of tuples like `[('erk:/ocse/0.2/math',  '/path/to/erk-data/ocse/math1.py'), ...],
-    mods = list(pyerk.ds.mod_path_mapping.a.items())
-    context = dict(loaded_pyerk_mods=mods)
+    # this is a list of tuples like `[('irk:/ocse/0.2/math',  '/path/to/irk-data/ocse/math1.py'), ...],
+    mods = list(pyirk.ds.mod_path_mapping.a.items())
+    context = dict(loaded_pyirk_mods=mods)
 
     return render(request, "mainapp/page-landing.html", context)
 
@@ -53,7 +53,7 @@ def _entity_sort_key(entity) -> Tuple[str, int]:
     """
 
     uri = entity.uri
-    mod_uri, sk = uri.split(pyerk.settings.URI_SEP)
+    mod_uri, sk = uri.split(pyirk.settings.URI_SEP)
 
     if sk[1].isdigit():
         num = int(sk[1:])
@@ -100,7 +100,7 @@ def get_item(request):
 
 def mockup(request):
     util.reload_data_if_necessary()
-    db_entity = get_object_or_404(Entity, uri=pyerk.u("I5"))
+    db_entity = get_object_or_404(Entity, uri=pyirk.u("I5"))
     rendered_entity = render_entity_inline(db_entity, idx=23, script_tag="myscript", include_description=True)
     context = dict(greeting_message="Hello, World!", rendered_entity=rendered_entity)
 
@@ -141,19 +141,19 @@ def entity_visualization_view(request, uri: Optional[str] = None):
     return entity_view(request, uri, vis_options=vis_dict)
 
 
-def render_entity_inline(entity: Union[Entity, pyerk.Entity], **kwargs) -> str:
+def render_entity_inline(entity: Union[Entity, pyirk.Entity], **kwargs) -> str:
 
-    # allow both models.Entity (from db) and "code-defined" pyerk.Entity
-    if isinstance(entity, pyerk.Entity):
+    # allow both models.Entity (from db) and "code-defined" pyirk.Entity
+    if isinstance(entity, pyirk.Entity):
         code_entity = entity
     elif isinstance(entity, Entity):
         try:
-            code_entity = pyerk.ds.get_entity_by_uri(entity.uri)
-        except pyerk.auxiliary.UnknownURIError:
-            # problematic: # erk:/ocse/0.2/zebra_puzzle_rules#I701
+            code_entity = pyirk.ds.get_entity_by_uri(entity.uri)
+        except pyirk.auxiliary.UnknownURIError:
+            # problematic: # irk:/ocse/0.2/zebra_puzzle_rules#I701
 
             #hack
-            code_entity = pyerk.ds.get_entity_by_uri("erk:/builtins#I40")
+            code_entity = pyirk.ds.get_entity_by_uri("irk:/builtins#I40")
             # IPS()
     else:
         # TODO: improve handling of literal values
@@ -202,7 +202,7 @@ def render_entity_relations(db_entity: Entity) -> str:
     # #########################################################################
 
     # dict like {"R1": [<RelationEdge 1234>, ...], "R2": [...]}
-    statements0 = pyerk.ds.statements[uri]
+    statements0 = pyirk.ds.statements[uri]
 
     # create a flat list of template-friendly dicts
     re_dict_2tuples = []
@@ -220,7 +220,7 @@ def render_entity_relations(db_entity: Entity) -> str:
     # #########################################################################
 
     # dict like {"R4": [<RelationEdge 1234>, ...], "R8": [...]}
-    inv_statements0 = pyerk.ds.inv_statements[uri]
+    inv_statements0 = pyirk.ds.inv_statements[uri]
 
     # create a flat list of template-friendly dicts
     inv_re_dict_2tuples = []
@@ -238,7 +238,7 @@ def render_entity_relations(db_entity: Entity) -> str:
     # #########################################################################
 
     ctx = {
-        "main_entity": {"special_class": "highlight", **represent_entity_as_dict(pyerk.ds.get_entity_by_uri(uri))},
+        "main_entity": {"special_class": "highlight", **represent_entity_as_dict(pyirk.ds.get_entity_by_uri(uri))},
         "re_dict_2tuples": re_dict_2tuples,
         "inv_re_dict_2tuples": inv_re_dict_2tuples,
     }
@@ -249,30 +249,30 @@ def render_entity_relations(db_entity: Entity) -> str:
 
 
 def render_entity_scopes(db_entity: Entity) -> str:
-    code_entity = pyerk.ds.get_entity_by_uri(db_entity.uri)
+    code_entity = pyirk.ds.get_entity_by_uri(db_entity.uri)
     # noinspection PyProtectedMember
 
-    scopes = pyerk.get_scopes(code_entity)
+    scopes = pyirk.get_scopes(code_entity)
 
     scope_contents = []
     for scope in scopes:
 
         # #### first: handle "variables" (locally relevant items) defined in this scope
 
-        items = pyerk.get_items_defined_in_scope(scope)
-        re: pyerk.RelationEdge
+        items = pyirk.get_items_defined_in_scope(scope)
+        re: pyirk.RelationEdge
         # currently we only use `R4__instance_of` as "defining relation"
         # statements = [re for key, re_list in statements0.items() if key not in black_listed_keys for re in re_list]
         defining_relation_triples = []
         for item in items:
-            for re in pyerk.ds.statements[item.short_key]["R4"]:
+            for re in pyirk.ds.statements[item.short_key]["R4"]:
                 defining_relation_triples.append(list(map(represent_entity_as_dict, re.relation_tuple)))
 
         # #### second: handle further relation triples in this scope
 
         statement_relations = []
-        re: pyerk.RelationEdge
-        for re in pyerk.ds.scope_statements[scope.short_key]:
+        re: pyirk.RelationEdge
+        for re in pyirk.ds.scope_statements[scope.short_key]:
             dict_tup = tuple(represent_entity_as_dict(elt) for elt in re.relation_tuple)
             statement_relations.append(dict_tup)
 
@@ -294,7 +294,7 @@ def render_entity_scopes(db_entity: Entity) -> str:
 
 def represent_entity_as_dict(code_entity: Union[Entity, object]) -> dict:
 
-    if isinstance(code_entity, pyerk.Entity):
+    if isinstance(code_entity, pyirk.Entity):
 
         # this is used where the replacement for highlighting is done
         _replacement_exceptions = []
@@ -346,14 +346,14 @@ class SearchSparqlView(View):
         context = {}
         c = attr_dict()
 
-        example_query = twdd(pyerk.rdfstack.get_sparql_example_query())
+        example_query = twdd(pyirk.rdfstack.get_sparql_example_query())
         qsrc = context["query"] = request.GET.get("query", example_query)
 
         try:
-            tmp_results = pyerk.rdfstack.perform_sparql_query(qsrc)
+            tmp_results = pyirk.rdfstack.perform_sparql_query(qsrc)
             sparql_vars = [str(v) for v in tmp_results.vars]
-            c.results = pyerk.aux.apply_func_to_table_cells(render_entity_inline, tmp_results)
-        except pyerk.rdfstack.ParseException as e:
+            c.results = pyirk.aux.apply_func_to_table_cells(render_entity_inline, tmp_results)
+        except pyirk.rdfstack.ParseException as e:
             context["err"] = f"The following error occurred: {type(e).__name__}: {str(e)}"
             c.results = []
             sparql_vars = []
@@ -371,11 +371,11 @@ class EditorView(View):
 
         c = context = attr_dict()
         if uri is None:
-            uri2 = pyerk.ds.mod_path_mapping.b.get(settings.LC.ERK_DATA_MAIN_MOD)
+            uri2 = pyirk.ds.mod_path_mapping.b.get(settings.LC.IRK_DATA_MAIN_MOD)
         else:
             uri2 = urllib.parse.unquote(uri)
 
-        c.fpath = pyerk.ds.mod_path_mapping.a.get(uri2)
+        c.fpath = pyirk.ds.mod_path_mapping.a.get(uri2)
 
         if not c.fpath:
             c.err = f"Invalid uri: `{uri2}` (parsed from uri-argument: `{uri}`)"
@@ -422,7 +422,7 @@ def get_auto_complete_list(request):
     This list consists mostly of short keys and indexed-keys and
 
     """
-    all_entities = [*pyerk.ds.relations.values(), *pyerk.ds.items.values()]
+    all_entities = [*pyirk.ds.relations.values(), *pyirk.ds.items.values()]
     completion_suggestions = []
     for entity in all_entities:
 
@@ -432,7 +432,7 @@ def get_auto_complete_list(request):
 
         completion_suggestions.append(entity.short_key)
         completion_suggestions.append(f'{entity.short_key}["{entity.R1}"]')
-        if isinstance(entity, pyerk.Relation):
+        if isinstance(entity, pyirk.Relation):
             underscore_r1 = entity.R1.replace(" ", "_")
             completion_suggestions.append(f"{entity.short_key}__{underscore_r1}")
 
@@ -451,6 +451,6 @@ def debug_view(request, xyz=0):
     txt = f"""
     {os.getcwd()}
 
-    {pyerk.auxiliary.get_erk_root_dir()}
+    {pyirk.auxiliary.get_irk_root_dir()}
     """
     return HttpResponse(f"Some plain message {xyz}; {txt}")

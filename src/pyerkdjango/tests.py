@@ -13,9 +13,9 @@ from ipydex import IPS
 # `python manage.py test --rednose` # with colors
 
 current_path = os.path.abspath(sys.modules.get(__name__).__file__)
-q = os.environ["PYERK_BASE_DIR"] = (pathlib.Path(current_path).parents[3] / "erk-data-for-unittests/ocse/").as_posix()
+q = os.environ["PYIRK_BASE_DIR"] = (pathlib.Path(current_path).parents[3] / "irk-data-for-unittests/ocse/").as_posix()
 
-settings.LC.initialize_pyerk_settings()
+settings.LC.initialize_pyirk_settings()
 
 
 class TestMainApp1(TestCase):
