@@ -15,10 +15,14 @@ from django.conf import settings
 
 # assume directory structure as in README
 if not os.environ.get("PYIRK_BASE_DIR"):
+
+    # assume that cwd is the repo root
     os.environ["PYIRK_BASE_DIR"] = \
-        Path("./").joinpath("..", "irk-data-for-unittests", "irk-ocse").absolute().as_posix()
+        Path("./").joinpath("tests", "testdata", "ocse_subset").absolute().as_posix()
+        # Path("./").joinpath("..", "irk-data", "irk-ocse").absolute().as_posix()
 
 os.environ["PYIRK_BASE_DIR"] = os.path.abspath(os.environ["PYIRK_BASE_DIR"])
+# os.environ["PYIRK_CONF_PATH"] = os.path.abspath(os.environ["PYIRK_BASE_DIR"])
 
 
 # if this fails the tests should not be run
@@ -377,7 +381,7 @@ class Test_03_Utils(HouskeeperMixin, unittest.TestCase):
         # test backup
         self.assertFalse(os.path.exists(self.backup_dir))
         pyirkdjango.util.savetxt(self.fpath, test_content, backup=True)
-    self.assertTrue(os.path.exists(self.backup_dir))
+        self.assertTrue(os.path.exists(self.backup_dir))
 
         dir_content = os.listdir(self.backup_dir)
         self.assertEqual(len(dir_content), 1)
