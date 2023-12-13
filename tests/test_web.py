@@ -195,9 +195,9 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
             <span class="entity-key highlight"><a href="/e/irk%253A%252Fbuiltins%2523I12">I12</a></span><!--
             --><!--
             --><!--
-            -->["<span class="entity-label" title="base class for any knowledge object of interrest in the field of mathematics">mathematical object</span>"]<!--
+            -->["<span class="entity-label" title="base class for any knowledge object of interest in the field of mathematics">mathematical object</span>"]<!--
             -->
-            <div class="entity-description">base class for any knowledge object of interrest in the field of mathematics</div>
+            <div class="entity-description">base class for any knowledge object of interest in the field of mathematics</div>
             """
         )
         self.assertIn(src1, content)
@@ -211,7 +211,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
 
         # note: currently the ocse is already loaded in the views
         # mod1 = p.irkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
-        url = reverse("entitypage", kwargs=dict(uri=w("ct__I9907")))
+        url = reverse("entitypage", kwargs=dict(uri=w("ma__I9907")))
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
         # TODO: add some actual test code here (which was probaly forgotten earlier)
@@ -267,11 +267,12 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
         # mod1 = p.irkloader.load_mod_from_path(TEST_DATA_PATH2, prefix="ct")
         self.assertIn("ct", p.ds.uri_prefix_mapping.b)
 
-        url = reverse("entityvisualization", kwargs=dict(uri=w("ct__I9907")))
+        # I9907["definition of square matrix"]
+        url = reverse("entityvisualization", kwargs=dict(uri=w("ma__I9907")))
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
 
-        test_str = f"utc_visualization_of_{u('ct__I9907')}"
+        test_str = f"utc_visualization_of_{u('ma__I9907')}"
         content = res.content.decode("utf8")
 
         with open("tmp.txt", "w") as txtfile:
@@ -287,6 +288,7 @@ class Test_02_MainApp(HouskeeperMixin, TestCase):
 
         txt = f'<a href="{item_url}">I9906'
 
+        # IPS()
         self.assertIn(txt, content)
 
         url_vis = reverse("entityvisualization", kwargs={"uri": urlquote(u("ma__I9906"))})
