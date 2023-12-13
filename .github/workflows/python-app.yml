@@ -5,7 +5,7 @@ name: CI
 
 on:
   push:
-    branches: 
+    branches:
     - main
     - develop
     - develop_carsten
@@ -51,13 +51,13 @@ jobs:
         # install this package
         pwd
         pip install -r requirements.txt
-        
-        
-    - name: install pyirk
+
+
+    - name: install pyirkdjango
       run: |
         # install in editable mode -> simplify the discovery of the (internal) test data
         pip install -e .
 
     - name: run all tests
       run: |
-        pytest
+        python manage.py test
