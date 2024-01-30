@@ -9,8 +9,8 @@ build-backend = "setuptools.build_meta"
 [project]
 
 
-name = "pyerkdjango"
-description = "Django frontend'Emergent Representation of Knowledge' (pyERK)"
+name = "pyirkdjango"
+description = "Django frontend for 'Imperative Representation of Knowledge' (pyIRK)"
 authors=[{name = "Carsten Knoll", email = "firstname.lastname@posteo.de"}]
 readme = "README.md"
 requires-python = ">=3.8"
@@ -25,7 +25,7 @@ classifiers=[
 ]
 
 [project.urls]
-Homepage = "https://github.com/ackrep-org/pyerk-django/"
+Homepage = "https://github.com/ackrep-org/pyirk-django/"
 
 [tool.setuptools.packages.find]
 # note: `include-package-data = true` by default in pyproject.toml
@@ -33,9 +33,9 @@ where = ["src"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
-version = {attr = "pyerkdjango.__version__"}
+version = {attr = "pyirkdjango.__version__"}
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "src.pyerkdjango.django_project.settings"
+DJANGO_SETTINGS_MODULE = "src.pyirkdjango.django_project.settings"
 # -- recommended but optional:
 python_files = ["test_*.py", "*_test.py", "testing/python/*.py"]
